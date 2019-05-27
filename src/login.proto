@@ -1,0 +1,17 @@
+syntax="proto3";
+
+package main;
+
+enum ReturnCode {
+      retOK = 0;
+      retFail = 1;
+	  retExist = 1001;
+}
+
+message LoginReq {
+      string name = 1;      
+}
+
+message LoginRes {
+      ReturnCode retCode = 1;
+}
