@@ -1,0 +1,17 @@
+syntax="proto3";
+
+package packet.lobby;
+
+enum ReturnCode {
+      retOK = 0;
+      retFail = 1;
+	  retExist = 1001;
+}
+
+message LoginReq {	
+	string name = 2;      
+}
+
+message LoginRes {	
+	ReturnCode retCode = 2;
+}
