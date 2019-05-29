@@ -1,0 +1,9 @@
+syntax="proto3";
+
+package packet.returncode;
+
+enum ReturnCode {
+      retOK = 0;
+      retFail = 1;
+	  retExist = 1001;
+}
