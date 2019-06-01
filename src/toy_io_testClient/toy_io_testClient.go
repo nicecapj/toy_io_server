@@ -1,27 +1,23 @@
 package main
 
 import (
+	Network "Network"
 	"fmt"
 	"log"
 	"net"
-	. "packet_lobby"
+	LobbyPacket "packet_lobby"
 
 	"github.com/golang/protobuf/proto"
 )
 
 //-----------------------------------------------------------------------------
-type Session struct {
-	conn net.Conn
+type ClientSession struct {
+	Network.Session
 }
 
-func CreateSession(conn net.Conn) *Session {
-	newSession := new(Session)
-	newSession.conn = conn
-	return newSession
-}
-
-func (session *Session) ReqestLogin(userName string) {
-	packet := &LoginReq{
+//-----------------------------------------------------------------------------
+func (session *ClientSession) ReqestLogin(userName string) {
+	packet := &LobbyPacket.LoginReq{
 		Name: userName,
 	}
 
@@ -30,26 +26,17 @@ func (session *Session) ReqestLogin(userName string) {
 		log.Fatal("marshaling error: ", err)
 		panic(err)
 	}
-	session.conn.Write([]byte(data))
-}
-
-func (session *Session) Send(packet []byte) (int, error) {
-	readSize, err := session.conn.Write([]byte(packet))
-	return readSize, err
-}
-
-func (session *Session) Recv(packet []byte) (int, error) {
-	readSize, err := session.conn.Read([]byte(packet))
-	return readSize, err
+	session.Conn.Write([]byte(data))
 }
 
 //-----------------------------------------------------------------------------
-
+// RecoverError recover panic and print err
 func RecoverError() {
 	err := recover()
 	log.Fatalln(err)
 }
 
+// ProcessError call panic when error occurs
 func ProcessError(err error) {
 	if err != nil {
 		panic(err)
@@ -61,7 +48,7 @@ func main() {
 	conn, err := net.Dial("tcp", "127.0.0.1:6666")
 	ProcessError(err)
 
-	session := CreateSession(conn)
+	session := Network.CreateSession(conn)
 
 	fmt.Println("input name")
 
@@ -73,7 +60,7 @@ func main() {
 
 		text := "hello"
 
-		req := LoginReq{}
+		req := LobbyPacket.LoginReq{}
 		req.Name = text
 		packet, err := proto.Marshal(&req)
 		ProcessError(err)
@@ -85,7 +72,7 @@ func main() {
 		recvBuffer := make([]byte, 4096)
 		readn, err := session.Recv(recvBuffer)
 
-		loginRes := LoginRes{}
+		loginRes := LobbyPacket.LoginRes{}
 		proto.Unmarshal(recvBuffer[:readn], &loginRes)
 
 		log.Printf("Recv : loginRes : %d\n", loginRes.GetRetCode())
