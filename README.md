@@ -3,25 +3,29 @@
 
 
 1. Ready for work
-download protoc.exe
+install golang 1.12.5
+
+2. install ide(in my case, used vs code and plugin)
+
+3.download protoc.exe
 https://repo1.maven.org/maven2/com/google/protobuf/protoc/3.6.1/ 
 
-2. 
-go get github.com/golang/protobuf/protoc-gen-go
-
-3.
+4.download protobuff package
 go get github.com/golang/protobuf/proto
 
+5. download protoc go version
+go get github.com/golang/protobuf/protoc-gen-go
 
-4. make protobuf go file
+6. make protobuf go file
 protoc --go_out=. login.proto
+protoc --go_out=. returncode.proto
 
 
 
 
 
 
-for go clien
+for go client
 protoc --go_out=. login.proto
 
 
