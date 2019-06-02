@@ -4,8 +4,10 @@ import (
 	Network "Network"
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	LobbyPacket "packet_lobby"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 )
@@ -42,12 +44,28 @@ func (session *ClientSession) reqestLogin(userName string) {
 	processError(err)
 
 	//log.Printf("Recv : loginRes : %d\n", loginRes.GetRetCode())
-	log.Printf(loginRes.String())
+	log.Printf("%s\n", loginRes.String())
 }
 
 func recoverError() {
 	err := recover()
 	log.Fatalln(err)
+}
+
+//GetRandomName ...
+func GetRandomName() string {
+	alpha := []string{
+		"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "z", "y", "z",
+	}
+
+	rand.Seed(time.Now().Unix())
+
+	name := ""
+	for i := 0; i < 10; i++ {
+		name = name + alpha[rand.Intn(len(alpha))]
+	}
+
+	return name
 }
 
 // processError call panic when error occurs
@@ -70,7 +88,9 @@ func main() {
 	fmt.Println("input name")
 
 	for {
-		clientSession.reqestLogin("hello_abc")
+		name := GetRandomName()
+		clientSession.reqestLogin(name)
+		time.Sleep(1 * time.Second)
 	}
 
 	// //recv
