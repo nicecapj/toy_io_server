@@ -10,71 +10,91 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-//-----------------------------------------------------------------------------
+//ClientSession is ...
 type ClientSession struct {
 	Network.Session
 }
 
-//-----------------------------------------------------------------------------
-func (session *ClientSession) ReqestLogin(userName string) {
-	packet := &LobbyPacket.LoginReq{
-		Name: userName,
-	}
+// func (session *ClientSession) Init(conn net.Conn) {
+// 	session.Session.Conn = Network.CreateSession(conn)
+// }
 
-	data, err := proto.Marshal(packet)
-	if err != nil {
-		log.Fatal("marshaling error: ", err)
-		panic(err)
-	}
-	session.Conn.Write([]byte(data))
+//-----------------------------------------------------------------------------
+func (session *ClientSession) reqestLogin(userName string) {
+
+	req := &LobbyPacket.LoginReq{}
+	req.Name = userName
+	packet, err := proto.Marshal(req)
+	processError(err)
+
+	writeSize, err := session.Send(packet)
+	processError(err)
+	log.Printf("send : %d\n", writeSize)
+	log.Printf(req.String())
+
+	recvBuffer := make([]byte, 4096)
+	readn, err := session.Recv(recvBuffer)
+	processError(err)
+	log.Printf("recv : %d\n", readn)
+
+	loginRes := &LobbyPacket.LoginRes{}
+	err = proto.Unmarshal(recvBuffer[:readn], loginRes)
+	processError(err)
+
+	//log.Printf("Recv : loginRes : %d\n", loginRes.GetRetCode())
+	log.Printf(loginRes.String())
 }
 
-//-----------------------------------------------------------------------------
-// RecoverError recover panic and print err
-func RecoverError() {
+func recoverError() {
 	err := recover()
 	log.Fatalln(err)
 }
 
-// ProcessError call panic when error occurs
-func ProcessError(err error) {
+// processError call panic when error occurs
+func processError(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
 func main() {
-	defer RecoverError()
+	defer recoverError()
 	conn, err := net.Dial("tcp", "127.0.0.1:6666")
-	ProcessError(err)
+	processError(err)
 
-	session := Network.CreateSession(conn)
+	clientSession := ClientSession{}
+	clientSession.Session.InitConnection(conn)
+
+	defer clientSession.Session.Conn.Close()
 
 	fmt.Println("input name")
 
 	for {
-		// reader := bufio.NewReader(os.Stdin)
-		// fmt.Println("To Send Message :")
-		// text, err := reader.ReadString('\n')
-		// ProcessError(err)
-
-		text := "hello"
-
-		req := LobbyPacket.LoginReq{}
-		req.Name = text
-		packet, err := proto.Marshal(&req)
-		ProcessError(err)
-
-		writeSize, err := session.Send(packet)
-		ProcessError(err)
-		log.Printf("send : %d\n", writeSize)
-
-		recvBuffer := make([]byte, 4096)
-		readn, err := session.Recv(recvBuffer)
-
-		loginRes := LobbyPacket.LoginRes{}
-		proto.Unmarshal(recvBuffer[:readn], &loginRes)
-
-		log.Printf("Recv : loginRes : %d\n", loginRes.GetRetCode())
+		clientSession.reqestLogin("hello_abc")
 	}
+
+	// //recv
+	// go func(client *ClientSession) {
+	// 	buffer := make([]byte, 4096)
+	// 	for {
+	// 		//readSize, err := client.Recv(buffer)
+	// 		if !client.IsConnected() {
+	// 			return
+	// 		}
+
+	// 		readSize, _ := client.Recv(buffer)
+	// 		//processError(err)
+
+	// 		if readSize > 0 {
+	// 			client.reqestLogin("hello")
+	// 		}
+	// 	}
+	// }(&clientSession)
+
+	// //send
+	// //recv에서 처리하고 보낼 패킷을 컨테이너에 저장해서 여기서 보내줘야 정석
+	// //현재는 recv하면 바로 처리해서 send한다
+	// go func(client *ClientSession) {
+
+	// }(&clientSession)
 }
