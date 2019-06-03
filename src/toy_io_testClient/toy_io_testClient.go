@@ -58,7 +58,8 @@ func GetRandomName() string {
 		"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "z", "y", "z",
 	}
 
-	rand.Seed(time.Now().Unix())
+	seedValue := time.Now().Unix()
+	rand.Seed(seedValue)
 
 	name := ""
 	for i := 0; i < 10; i++ {
@@ -90,7 +91,7 @@ func main() {
 	for {
 		name := GetRandomName()
 		clientSession.reqestLogin(name)
-		time.Sleep(1 * time.Second)
+		//time.Sleep(1 * time.Second)
 	}
 
 	// //recv
