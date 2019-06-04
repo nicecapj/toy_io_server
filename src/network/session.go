@@ -1,3 +1,4 @@
+//reference : https://golang.org/src/encoding/binary/example_test.go
 package network
 
 import (
@@ -99,9 +100,9 @@ func (session *Session) HandlePacket(packet []byte) {
 			res := &LobbyPacket.LoginRes{}
 			res.RetCode = ReturnCode.ReturnCode_retExist
 			res.Uid = 1234 //sessionManager.GetUID(name)
-			session.SendPacket(PROTOCOL.ProtocolID_LoginReS, res)
+			session.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
 		}
-	case PROTOCOL.ProtocolID_LoginReS:
+	case PROTOCOL.ProtocolID_LoginRes:
 		{
 			res := &LobbyPacket.LoginRes{}
 			err = proto.Unmarshal(packet[PacketHeaderLen:MaxPacketSize], res)
