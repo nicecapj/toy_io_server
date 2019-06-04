@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package packet.protocol;
+
+enum ProtocolID {	
+	ProtocolBegin = 0;
+	LoginReq = 1;
+	LoginRes = 2;
+}

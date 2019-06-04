@@ -5,12 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	LobbyPacket "packet_lobby"
-	ReturnCode "packet_returncode"
-
-	"strconv"
-
-	"github.com/golang/protobuf/proto"
 )
 
 // ServerSession is...
@@ -20,38 +14,23 @@ type ServerSession struct {
 
 func handleLogin(sessionManager *Network.SessionManager, session *Network.Session, buffer []byte, size int) {
 	//이렇게 명시 안하고, 해더보고 파악하려면?
-	req := &LobbyPacket.LoginReq{}
-	err := proto.Unmarshal(buffer[:size], req)
-	processError(err)
-	log.Printf(req.String())
-
-	name := req.GetName()
-	log.Printf("Logged : %s", name)
+	session.HandlePacket(buffer)
 
 	//var res *LobbyPacket.LoginRes
 	//res = new(LobbyPacket.LoginRes) new할 필요없이 &구조체{} 형식으로 선언하면 된다
-	res := &LobbyPacket.LoginRes{}
+	//res := &LobbyPacket.LoginRes{}
 
-	if sessionManager.FindUser(name) {
-		res.RetCode = ReturnCode.ReturnCode_retExist
-		res.Uid = sessionManager.GetUID(name)
-	} else {
-		sessionManager.AddUser(name)
-		res.RetCode = ReturnCode.ReturnCode_retOK
-		res.Uid = sessionManager.GetUID(name)
-	}
-	log.Printf(res.String())
+	// if sessionManager.FindUser(name) {
+	// 	res.RetCode = ReturnCode.ReturnCode_retExist
+	// 	res.Uid = sessionManager.GetUID(name)
+	// } else {
+	// 	sessionManager.AddUser(name)
+	// 	res.RetCode = ReturnCode.ReturnCode_retOK
+	// 	res.Uid = sessionManager.GetUID(name)
+	// }
 
-	packet, err := proto.Marshal(res)
-	processError(err)
-	log.Printf("Packet size : %d", len(packet))
-
-	fmt.Println(res.String())
-	wroteSize, err := session.Send(packet)
-	processError(err)
-
-	fmt.Println("Send : " + strconv.Itoa(wroteSize))
-	log.Printf(res.String())
+	//log.Printf(res.String())
+	//session.SendPacket(PROTOCOL.ProtocolID_LoginReS, res)
 }
 
 //-----------------------------------------------------------------------------

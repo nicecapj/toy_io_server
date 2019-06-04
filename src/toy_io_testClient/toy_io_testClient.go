@@ -7,9 +7,8 @@ import (
 	"math/rand"
 	"net"
 	LobbyPacket "packet_lobby"
+	PROTOCOL "packet_protocol"
 	"time"
-
-	"github.com/golang/protobuf/proto"
 )
 
 //ClientSession is ...
@@ -26,25 +25,23 @@ func (session *ClientSession) reqestLogin(userName string) {
 
 	req := &LobbyPacket.LoginReq{}
 	req.Name = userName
-	packet, err := proto.Marshal(req)
-	processError(err)
-
-	writeSize, err := session.Send(packet)
-	processError(err)
-	log.Printf("send : %d\n", writeSize)
-	log.Printf(req.String())
+	session.SendPacket(PROTOCOL.ProtocolID_LoginReq, req)
 
 	recvBuffer := make([]byte, 4096)
 	readn, err := session.Recv(recvBuffer)
 	processError(err)
 	log.Printf("recv : %d\n", readn)
+	session.HandlePacket(recvBuffer)
 
-	loginRes := &LobbyPacket.LoginRes{}
-	err = proto.Unmarshal(recvBuffer[:readn], loginRes)
-	processError(err)
+	// processError(err)
+	// log.Printf("recv : %d\n", readn)
 
-	//log.Printf("Recv : loginRes : %d\n", loginRes.GetRetCode())
-	log.Printf("%s\n", loginRes.String())
+	// loginRes := &LobbyPacket.LoginRes{}
+	// err = proto.Unmarshal(recvBuffer[:readn], loginRes)
+	// processError(err)
+
+	// //log.Printf("Recv : loginRes : %d\n", loginRes.GetRetCode())
+	// log.Printf("%s\n", loginRes.String())
 }
 
 func recoverError() {
