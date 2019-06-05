@@ -58,13 +58,18 @@ func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Mess
 	}
 
 	var header Header
-	header.packetID = protocolID
-	header.packetSize = PacketHeaderLen + int32(len(body))
+	header.PacketID = protocolID
+	header.PacketSize = PacketHeaderLen + int32(len(body))
 
 	buffer, err := session.SetHeader(header)
 	if err != nil {
 		log.Fatalln("set header")
 	}
+
+	defer func() {
+		buffer.Reset()
+		session.poolBuffer.Put(buffer)
+	}()
 
 	buffer.Write(body)
 
@@ -83,19 +88,29 @@ func (session *Session) SetHeader(header Header) (*bytes.Buffer, error) {
 }
 
 // Recv ...
-//func (session *Session) HandlePacket() (int, error) {
-func (session *Session) HandlePacket(packet []byte) {
-	header, err := GetHeader(packet)
+//func (session *Session) HandlePacket(packet []byte) {
+func (session *Session) HandlePacket(bufferArray []byte) {
+
+	//풀을 여기서는 안써도 되지 않을까. 괜히 복사나 한번 더 일어나지
+	// buffer := session.poolBuffer.Get().(*bytes.Buffer)
+	// defer func() {
+	// 	buffer.Reset()
+	// 	session.poolBuffer.Put(buffer)
+	// }()
+	// buffer.Write(packet[:MaxPacketSize])
+
+	// bufferArray := buffer.Bytes()
+	header, err := GetHeader(bufferArray[:MaxPacketSize])
 	if err != nil {
 		log.Fatalln("read header")
 	}
 
-	switch header.packetID {
+	switch header.PacketID {
 	case PROTOCOL.ProtocolID_LoginReq:
 		{
 			req := &LobbyPacket.LoginReq{}
-			err = proto.Unmarshal(packet[PacketHeaderLen:MaxPacketSize], req)
-			log.Printf("%s\n", req.String)
+			err = proto.Unmarshal(bufferArray[PacketHeaderLen:MaxPacketSize], req)
+			log.Printf("%s\n", req.String())
 
 			res := &LobbyPacket.LoginRes{}
 			res.RetCode = ReturnCode.ReturnCode_retExist
@@ -105,14 +120,15 @@ func (session *Session) HandlePacket(packet []byte) {
 	case PROTOCOL.ProtocolID_LoginRes:
 		{
 			res := &LobbyPacket.LoginRes{}
-			err = proto.Unmarshal(packet[PacketHeaderLen:MaxPacketSize], res)
-			log.Printf("%s\n", res.String)
+			err = proto.Unmarshal(bufferArray[PacketHeaderLen:MaxPacketSize], res)
+			log.Printf("%s\n", res.String())
 		}
 
 	}
 }
 
 func GetHeader(stream []byte) (Header, error) {
+
 	var header Header
 	buffer := bytes.NewReader(stream[:PacketHeaderLen])
 

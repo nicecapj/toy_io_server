@@ -3,6 +3,7 @@ package main
 import (
 	Network "Network"
 	"fmt"
+	"io"
 	"log"
 	"net"
 )
@@ -13,24 +14,7 @@ type ServerSession struct {
 }
 
 func handleLogin(sessionManager *Network.SessionManager, session *Network.Session, buffer []byte, size int) {
-	//이렇게 명시 안하고, 해더보고 파악하려면?
 	session.HandlePacket(buffer)
-
-	//var res *LobbyPacket.LoginRes
-	//res = new(LobbyPacket.LoginRes) new할 필요없이 &구조체{} 형식으로 선언하면 된다
-	//res := &LobbyPacket.LoginRes{}
-
-	// if sessionManager.FindUser(name) {
-	// 	res.RetCode = ReturnCode.ReturnCode_retExist
-	// 	res.Uid = sessionManager.GetUID(name)
-	// } else {
-	// 	sessionManager.AddUser(name)
-	// 	res.RetCode = ReturnCode.ReturnCode_retOK
-	// 	res.Uid = sessionManager.GetUID(name)
-	// }
-
-	//log.Printf(res.String())
-	//session.SendPacket(PROTOCOL.ProtocolID_LoginReS, res)
 }
 
 //-----------------------------------------------------------------------------
@@ -42,9 +26,12 @@ func handleSession(sessionManager *Network.SessionManager, session *Network.Sess
 	for {
 		//readnSize, err := session.conn.Read(buffer)
 		readSize, err := session.Recv(buffer)
-		if err != nil {
+		if err != nil && err != io.EOF {
 			log.Fatalln(err)
 			return //네트웍 연결 끊어진 경우
+		} else if err == io.EOF {
+			log.Printf("Close connection\n")
+			return
 		}
 
 		if readSize > 0 {

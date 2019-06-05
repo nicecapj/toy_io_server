@@ -5,17 +5,17 @@ import (
 )
 
 type Header struct {
-	packetID   PROTOCOL.ProtocolID
-	packetSize int32
+	PacketSize int32
+	PacketID   PROTOCOL.ProtocolID
 }
 
 const PacketHeaderLen = 8 //성능을 위해 sizeof하지 않는다
 const MaxPacketSize = 4096
 
 //MarshalPacket...
-//func SetHeader(packetID PROTOCOL.ProtocolID, ) (bytes.Buffer, error) {
+//func SetHeader(PacketID PROTOCOL.ProtocolID, ) (bytes.Buffer, error) {
 // 	header := Header{}
-// 	header.packetID = packetID
+// 	header.PacketID = PacketID
 
 // 	headerSize := unsafe.Sizeof(header)
 // 	packetBuffer := make([]byte, headerSize)
