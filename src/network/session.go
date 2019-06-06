@@ -1,9 +1,10 @@
-//reference : https://golang.org/src/encoding/binary/example_test.go
 package network
 
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"io"
 	"log"
 	"net"
 	LobbyPacket "packet_lobby"
@@ -19,6 +20,8 @@ type Session struct {
 	Conn        net.Conn
 	isConnected bool
 	poolBuffer  sync.Pool
+
+	Name string
 }
 
 // CreateSession make new session
@@ -54,7 +57,7 @@ func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Mess
 
 	body, err := proto.Marshal(pb)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 
 	var header Header
@@ -63,7 +66,7 @@ func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Mess
 
 	buffer, err := session.SetHeader(header)
 	if err != nil {
-		log.Fatalln("set header")
+		log.Panicln("set header")
 	}
 
 	defer func() {
@@ -81,7 +84,7 @@ func (session *Session) SetHeader(header Header) (*bytes.Buffer, error) {
 
 	err := binary.Write(buffer, binary.LittleEndian, header)
 	if err != nil {
-		log.Fatalln("write header")
+		log.Panicln("write header")
 	}
 
 	return buffer, err
@@ -102,7 +105,7 @@ func (session *Session) HandlePacket(bufferArray []byte) {
 	// bufferArray := buffer.Bytes()
 	header, err := GetHeader(bufferArray[:MaxPacketSize])
 	if err != nil {
-		log.Fatalln("read header")
+		log.Panicln("read header")
 	}
 
 	switch header.PacketID {
@@ -131,7 +134,7 @@ func GetHeader(stream []byte) (Header, error) {
 
 	err := binary.Read(buffer, binary.LittleEndian, &header)
 	if err != nil {
-		log.Fatalln("read header")
+		log.Panicln("read header")
 	}
 
 	return header, err
@@ -141,7 +144,7 @@ func GetHeader(stream []byte) (Header, error) {
 func (session *Session) Send(packet []byte) (int, error) {
 	readSize, err := session.Conn.Write([]byte(packet))
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	return readSize, err
 }
@@ -152,7 +155,16 @@ func (session *Session) Recv(packet []byte) (int, error) {
 
 	if err != nil {
 		session.isConnected = false
-		log.Fatalln(err)
+
+		if err == io.ErrClosedPipe {
+
+		} else if err == io.EOF {
+
+		} else {
+			//특정 상황에 에러가 알고 싶으면 아래 주석 활성화
+			//log.Panic(err)
+			fmt.Println(err)
+		}
 	}
 
 	return readSize, err
@@ -167,12 +179,16 @@ func (session *Session) IsConnected() bool {
 //Close ...
 func (session *Session) Close() {
 	session.Conn.Close()
+
+	SessionManager := GetSessionManager()
+	SessionManager.RemoveUser(session.Name)
 }
 
 func (session *Session) OnHandleLoginReq(req *LobbyPacket.LoginReq) {
 	sessionManager := GetSessionManager()
 
 	name := req.GetName()
+	session.Name = name
 
 	res := &LobbyPacket.LoginRes{}
 	if sessionManager.FindUser(name) {

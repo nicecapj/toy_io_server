@@ -32,16 +32,6 @@ func (session *ClientSession) reqestLogin(userName string) {
 	processError(err)
 	log.Printf("recv : %d\n", readn)
 	session.HandlePacket(recvBuffer)
-
-	// processError(err)
-	// log.Printf("recv : %d\n", readn)
-
-	// loginRes := &LobbyPacket.LoginRes{}
-	// err = proto.Unmarshal(recvBuffer[:readn], loginRes)
-	// processError(err)
-
-	// //log.Printf("Recv : loginRes : %d\n", loginRes.GetRetCode())
-	// log.Printf("%s\n", loginRes.String())
 }
 
 func recoverError() {

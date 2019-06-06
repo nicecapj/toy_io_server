@@ -8,7 +8,7 @@ import (
 //SessionManager ...
 type SessionManager struct {
 	sync.Mutex
-	userList      []string
+	userList      map[string]bool
 	uidList       map[string]int64
 	beginUIDIndex int64
 }
@@ -28,7 +28,7 @@ func GetSessionManager() *SessionManager {
 // Init ...
 func (sessionManager *SessionManager) Init() {
 
-	sessionManager.userList = make([]string, 64)
+	sessionManager.userList = make(map[string]bool)
 	//sessionManager.userList = []string{}
 	sessionManager.uidList = make(map[string]int64)
 	sessionManager.beginUIDIndex = 2222
@@ -38,21 +38,29 @@ func (sessionManager *SessionManager) Init() {
 func (sessionManager *SessionManager) AddUser(name string) bool {
 
 	sessionManager.Lock()
-	for id, item := range sessionManager.userList {
-		if item == "" {
-			sessionManager.userList[id] = name
-			sessionManager.Unlock()
-			return true
-		}
+	_, ok := sessionManager.userList[name]
+	if ok == false {
+		sessionManager.userList[name] = true
+
+		userCount := len(sessionManager.userList)
+		log.Printf("UserCount : %d", userCount)
+
+		sessionManager.Unlock()
+		return true
 	}
 
-	sessionManager.userList = append(sessionManager.userList, name)
-
-	userCount := len(sessionManager.userList)
-
-	log.Printf("UserCount : %d", userCount)
-	sessionManager.userList[userCount-1] = name
+	sessionManager.userList[name] = true
 	sessionManager.Unlock()
+	return true
+}
+
+func (sessionManager *SessionManager) RemoveUser(name string) bool {
+	if sessionManager.FindUser(name) == false {
+		return false
+	}
+
+	delete(sessionManager.userList, name)
+	log.Println("user: %s removed from sessionManager", name)
 
 	return true
 }
@@ -61,14 +69,10 @@ func (sessionManager *SessionManager) AddUser(name string) bool {
 func (sessionManager *SessionManager) FindUser(name string) bool {
 
 	sessionManager.Lock()
-	for _, item := range sessionManager.userList {
-		if item == name {
-			sessionManager.Unlock()
-			return true
-		}
-	}
+	_, ok := sessionManager.userList[name]
 	sessionManager.Unlock()
-	return false
+
+	return ok
 }
 
 //GetUID ...

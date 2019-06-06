@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"runtime"
 )
 
 // ServerSession is...
@@ -27,10 +28,14 @@ func handleSession(session *Network.Session) {
 		//readnSize, err := session.conn.Read(buffer)
 		readSize, err := session.Recv(buffer)
 		if err != nil && err != io.EOF {
-			log.Fatalln(err)
-			return //네트웍 연결 끊어진 경우
+			//log.Panicln(err)
+			fmt.Println(err)
+			return
 		} else if err == io.EOF {
 			log.Printf("Close connection\n")
+			return
+		} else if err != nil {
+			fmt.Println(err)
 			return
 		}
 
@@ -55,7 +60,10 @@ func recoverError() {
 
 //-----------------------------------------------------------------------------
 func main() {
-	defer recoverError()
+	//defer recoverError()
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	log.Printf("GOMAX Proc : %d\n", runtime.NumCPU())
 
 	//sessionManager := Network.GetSessionManager()
 

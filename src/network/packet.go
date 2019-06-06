@@ -4,12 +4,16 @@ import (
 	PROTOCOL "packet_protocol"
 )
 
+//Header is packet header
 type Header struct {
 	PacketSize int32
 	PacketID   PROTOCOL.ProtocolID
 }
 
-const PacketHeaderLen = 8 //성능을 위해 sizeof하지 않는다
+//PacketHeaderLen used for performance(call sizeof(Header))
+const PacketHeaderLen = 8
+
+//MaxPacketSize is limited size of packet
 const MaxPacketSize = 4096
 
 //MarshalPacket...
