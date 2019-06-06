@@ -13,12 +13,12 @@ type ServerSession struct {
 	Network.Session
 }
 
-func handleLogin(sessionManager *Network.SessionManager, session *Network.Session, buffer []byte, size int) {
+func handleLogin(session *Network.Session, buffer []byte, size int) {
 	session.HandlePacket(buffer)
 }
 
 //-----------------------------------------------------------------------------
-func handleSession(sessionManager *Network.SessionManager, session *Network.Session) {
+func handleSession(session *Network.Session) {
 
 	buffer := make([]byte, 4096)
 	defer session.Close()
@@ -35,7 +35,7 @@ func handleSession(sessionManager *Network.SessionManager, session *Network.Sess
 		}
 
 		if readSize > 0 {
-			handleLogin(sessionManager, session, buffer, readSize)
+			handleLogin(session, buffer, readSize)
 			//processError(err)
 		}
 	}
@@ -57,8 +57,7 @@ func recoverError() {
 func main() {
 	defer recoverError()
 
-	sessionManager := Network.SessionManager{}
-	sessionManager.Init()
+	//sessionManager := Network.GetSessionManager()
 
 	listener, err := net.Listen("tcp", ":6666")
 	processError(err)
@@ -70,8 +69,6 @@ func main() {
 
 		session := Network.CreateSession(conn)
 
-		//defer session.conn.Close()
-
-		go handleSession(&sessionManager, session)
+		go handleSession(session)
 	}
 }

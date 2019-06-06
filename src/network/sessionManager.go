@@ -13,6 +13,18 @@ type SessionManager struct {
 	beginUIDIndex int64
 }
 
+var instace *SessionManager
+var once sync.Once
+
+func GetSessionManager() *SessionManager {
+	once.Do(func() {
+		instace = &SessionManager{}
+		instace.Init()
+	})
+
+	return instace
+}
+
 // Init ...
 func (sessionManager *SessionManager) Init() {
 

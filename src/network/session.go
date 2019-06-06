@@ -112,10 +112,7 @@ func (session *Session) HandlePacket(bufferArray []byte) {
 			err = proto.Unmarshal(bufferArray[PacketHeaderLen:MaxPacketSize], req)
 			log.Printf("%s\n", req.String())
 
-			res := &LobbyPacket.LoginRes{}
-			res.RetCode = ReturnCode.ReturnCode_retExist
-			res.Uid = 1234 //sessionManager.GetUID(name)
-			session.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
+			session.OnHandleLoginReq(req)
 		}
 	case PROTOCOL.ProtocolID_LoginRes:
 		{
@@ -170,4 +167,21 @@ func (session *Session) IsConnected() bool {
 //Close ...
 func (session *Session) Close() {
 	session.Conn.Close()
+}
+
+func (session *Session) OnHandleLoginReq(req *LobbyPacket.LoginReq) {
+	sessionManager := GetSessionManager()
+
+	name := req.GetName()
+
+	res := &LobbyPacket.LoginRes{}
+	if sessionManager.FindUser(name) {
+		res.RetCode = ReturnCode.ReturnCode_retExist
+		res.Uid = sessionManager.GetUID(name)
+	} else {
+		sessionManager.AddUser(name)
+		res.RetCode = ReturnCode.ReturnCode_retOK
+		res.Uid = sessionManager.GetUID(name)
+	}
+	session.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
 }
