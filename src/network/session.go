@@ -7,9 +7,7 @@ import (
 	"io"
 	"log"
 	"net"
-	LobbyPacket "packet_lobby"
 	PROTOCOL "packet_protocol"
-	ReturnCode "packet_returncode"
 	"sync"
 
 	"github.com/golang/protobuf/proto"
@@ -17,6 +15,7 @@ import (
 
 // Session is basic struct for network communication
 type Session struct {
+	sync.Mutex
 	Conn        net.Conn
 	isConnected bool
 	poolBuffer  sync.Pool
@@ -90,6 +89,9 @@ func (session *Session) SetHeader(header Header) (*bytes.Buffer, error) {
 	return buffer, err
 }
 
+func (session *Session) OnReceived(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+}
+
 // Recv ...
 //func (session *Session) HandlePacket(packet []byte) {
 func (session *Session) HandlePacket(bufferArray []byte) {
@@ -108,23 +110,8 @@ func (session *Session) HandlePacket(bufferArray []byte) {
 		log.Panicln("read header")
 	}
 
-	switch header.PacketID {
-	case PROTOCOL.ProtocolID_LoginReq:
-		{
-			req := &LobbyPacket.LoginReq{}
-			err = proto.Unmarshal(bufferArray[PacketHeaderLen:MaxPacketSize], req)
-			log.Printf("%s\n", req.String())
-
-			session.OnHandleLoginReq(req)
-		}
-	case PROTOCOL.ProtocolID_LoginRes:
-		{
-			res := &LobbyPacket.LoginRes{}
-			err = proto.Unmarshal(bufferArray[PacketHeaderLen:MaxPacketSize], res)
-			log.Printf("%s\n", res.String())
-		}
-
-	}
+	//virtual처럼 동작하게 하고 싶은데?
+	session.OnReceived(header.PacketID, bufferArray)
 }
 
 func GetHeader(stream []byte) (Header, error) {
@@ -182,22 +169,4 @@ func (session *Session) Close() {
 
 	SessionManager := GetSessionManager()
 	SessionManager.RemoveUser(session.Name)
-}
-
-func (session *Session) OnHandleLoginReq(req *LobbyPacket.LoginReq) {
-	sessionManager := GetSessionManager()
-
-	name := req.GetName()
-	session.Name = name
-
-	res := &LobbyPacket.LoginRes{}
-	if sessionManager.FindUser(name) {
-		res.RetCode = ReturnCode.ReturnCode_retExist
-		res.Uid = sessionManager.GetUID(name)
-	} else {
-		sessionManager.AddUser(name)
-		res.RetCode = ReturnCode.ReturnCode_retOK
-		res.Uid = sessionManager.GetUID(name)
-	}
-	session.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
 }

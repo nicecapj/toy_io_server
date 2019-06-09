@@ -7,26 +7,18 @@ import (
 	"log"
 	"net"
 	"runtime"
+	"util"
 )
 
-// ServerSession is...
-type ServerSession struct {
-	Network.Session
-}
-
-func handleLogin(session *Network.Session, buffer []byte, size int) {
-	session.HandlePacket(buffer)
-}
-
 //-----------------------------------------------------------------------------
-func handleSession(session *Network.Session) {
+func handleSession(user *User) {
 
 	buffer := make([]byte, 4096)
-	defer session.Close()
+	defer user.Close()
 
 	for {
 		//readnSize, err := session.conn.Read(buffer)
-		readSize, err := session.Recv(buffer)
+		readSize, err := user.Recv(buffer)
 		if err != nil && err != io.EOF {
 			//log.Panicln(err)
 			fmt.Println(err)
@@ -40,22 +32,9 @@ func handleSession(session *Network.Session) {
 		}
 
 		if readSize > 0 {
-			handleLogin(session, buffer, readSize)
-			//processError(err)
+			user.HandlePacket(buffer)
 		}
 	}
-}
-
-func processError(err error) {
-	if err != nil {
-		panic(err)
-		//log.Fatalln(err)
-	}
-}
-
-func recoverError() {
-	err := recover()
-	fmt.Println(err)
 }
 
 //-----------------------------------------------------------------------------
@@ -68,15 +47,17 @@ func main() {
 	//sessionManager := Network.GetSessionManager()
 
 	listener, err := net.Listen("tcp", ":6666")
-	processError(err)
+	util.ProcessError(err)
 	defer listener.Close()
 
 	for {
 		conn, err := listener.Accept()
-		processError(err)
+		util.ProcessError(err)
 
 		session := Network.CreateSession(conn)
+		user := &User{}
+		user.Init(session)
 
-		go handleSession(session)
+		go handleSession(user)
 	}
 }
