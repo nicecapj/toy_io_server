@@ -31,3 +31,13 @@ protoc --go_out=. login.proto
 
 for c++ client
 protoc --cpp_out=. login.proto
+
+
+
+
+
+
+
+reference
+serialization/deserialization of header : https://golang.org/src/encoding/binary/example_test.go
+singleton : http://marcio.io/2015/07/singleton-pattern-in-go/
