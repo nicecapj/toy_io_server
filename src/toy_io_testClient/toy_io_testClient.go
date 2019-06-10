@@ -2,107 +2,134 @@ package main
 
 import (
 	Network "Network"
+	"bytes"
 	"fmt"
+	"io"
 	"log"
-	"math/rand"
 	"net"
-	LobbyPacket "packet_lobby"
-	PROTOCOL "packet_protocol"
-	"time"
+	"util"
 )
 
-//ClientSession is ...
-type ClientSession struct {
-	Network.Session
-}
-
-// func (session *ClientSession) Init(conn net.Conn) {
-// 	session.Session.Conn = Network.CreateSession(conn)
-// }
-
-//-----------------------------------------------------------------------------
-func (session *ClientSession) reqestLogin(userName string) {
-
-	req := &LobbyPacket.LoginReq{}
-	req.Name = userName
-	session.SendPacket(PROTOCOL.ProtocolID_LoginReq, req)
-
-	recvBuffer := make([]byte, 4096)
-	readn, err := session.Recv(recvBuffer)
-	processError(err)
-	log.Printf("recv : %d\n", readn)
-	session.HandlePacket(recvBuffer)
-}
-
-func recoverError() {
-	err := recover()
-	log.Fatalln(err)
-}
-
-//GetRandomName ...
-func GetRandomName() string {
-	alpha := []string{
-		"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "z", "y", "z",
-	}
-
-	seedValue := time.Now().Unix()
-	rand.Seed(seedValue)
-
-	name := ""
-	for i := 0; i < 10; i++ {
-		name = name + alpha[rand.Intn(len(alpha))]
-	}
-
-	return name
-}
-
-// processError call panic when error occurs
-func processError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
-	defer recoverError()
+	defer util.RecoverError()
 	conn, err := net.Dial("tcp", "127.0.0.1:6666")
-	processError(err)
+	util.ProcessError(err)
 
-	clientSession := ClientSession{}
-	clientSession.Session.InitConnection(conn)
+	session := Network.CreateSession(conn)
+	clientSession := &ClientSession{}
+	clientSession.Init(session)
 
-	defer clientSession.Session.Conn.Close()
-
-	fmt.Println("input name")
+	defer clientSession.Close()
 
 	for {
-		name := GetRandomName()
+		//send
+		name := util.GetRandomName()
 		clientSession.reqestLogin(name)
-		//time.Sleep(1 * time.Second)
+
+		//recv
+		recvBuffer := make([]byte, 4096)
+
+		buffer := clientSession.PoolBuffer.Get().(*bytes.Buffer)
+		defer func() {
+			buffer.Reset()
+			clientSession.PoolBuffer.Put(buffer)
+		}()
+
+		//readnSize, err := session.conn.Read(buffer)
+		readSize, err := session.Recv(recvBuffer)
+		if err != nil && err != io.EOF {
+			//log.Panicln(err)
+			fmt.Println(err)
+			return
+		} else if err == io.EOF {
+			log.Printf("Close connection\n")
+			return
+		} else if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if readSize == 0 {
+			continue
+		}
+
+		{
+			buffer.Write(recvBuffer[:readSize])
+
+			bufferArray := buffer.Bytes()
+
+			header, err := Network.GetHeader(bufferArray[:])
+			if err != nil {
+				log.Panicln("read header")
+			}
+
+			if header.PacketSize > Network.MaxPacketSize {
+				panic("packet size larger than maxsize")
+			}
+
+			clientSession.DispatchPacket(header.PacketID, bufferArray[Network.PacketHeaderLen:header.PacketSize])
+
+			buffer.Next(int(header.PacketSize))
+		}
 	}
 
 	// //recv
-	// go func(client *ClientSession) {
-	// 	buffer := make([]byte, 4096)
+	// go func(session *ClientSession) {
+	// 	recvBuffer := make([]byte, 4096)
+
+	// 	buffer := session.Session.PoolBuffer.Get().(*bytes.Buffer)
+	// 	defer func() {
+	// 		buffer.Reset()
+	// 		session.Session.PoolBuffer.Put(buffer)
+	// 	}()
+
 	// 	for {
-	// 		//readSize, err := client.Recv(buffer)
-	// 		if !client.IsConnected() {
+	// 		//readnSize, err := session.conn.Read(buffer)
+	// 		readSize, err := session.Recv(recvBuffer)
+	// 		if err != nil && err != io.EOF {
+	// 			//log.Panicln(err)
+	// 			fmt.Println(err)
 	// 			return
+	// 		} else if err == io.EOF {
+	// 			log.Printf("Close connection\n")
+	// 			return
+	// 		} else if err != nil {
+	// 			fmt.Println(err)
+	// 			return
+	// 		} else {
+	// 			continue
 	// 		}
 
-	// 		readSize, _ := client.Recv(buffer)
-	// 		//processError(err)
+	// 		if readSize == 0 {
+	// 			continue
+	// 		}
 
-	// 		if readSize > 0 {
-	// 			client.reqestLogin("hello")
+	// 		{
+	// 			buffer.Write(recvBuffer[:readSize])
+
+	// 			bufferArray := buffer.Bytes()
+
+	// 			header, err := Network.GetHeader(bufferArray[:])
+	// 			if err != nil {
+	// 				log.Panicln("read header")
+	// 			}
+
+	// 			if header.PacketSize > Network.MaxPacketSize {
+	// 				panic("packet size larger than maxsize")
+	// 			}
+
+	// 			session.DispatchPacket(header.PacketID, bufferArray[Network.PacketHeaderLen:header.PacketSize])
+
+	// 			buffer.Next(int(header.PacketSize))
 	// 		}
 	// 	}
-	// }(&clientSession)
+	// }(clientSession)
 
 	// //send
-	// //recv에서 처리하고 보낼 패킷을 컨테이너에 저장해서 여기서 보내줘야 정석
-	// //현재는 recv하면 바로 처리해서 send한다
+	// //fmt.Println("input name")
 	// go func(client *ClientSession) {
-
-	// }(&clientSession)
+	// 	name := GetRandomName()
+	// 	clientSession.reqestLogin(name)
+	// 	//time.Sleep(1 * time.Second)
+	// }(clientSession)
 }

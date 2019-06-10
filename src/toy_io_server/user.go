@@ -33,13 +33,6 @@ func (this *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) 
 
 			this.OnLoginReq(req)
 		}
-	case PROTOCOL.ProtocolID_LoginRes:
-		{
-			res := &LobbyPacket.LoginRes{}
-			err := proto.Unmarshal(buffer[:], res)
-			Util.ProcessError(err)
-			log.Printf("%s\n", res.String())
-		}
 	}
 }
 
