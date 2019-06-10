@@ -2,6 +2,7 @@ package main
 
 import (
 	Network "Network"
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -13,12 +14,18 @@ import (
 //-----------------------------------------------------------------------------
 func handleSession(user *User) {
 
-	buffer := make([]byte, 4096)
+	recvBuffer := make([]byte, 4096)
 	defer user.Close()
+
+	buffer := user.Session.PoolBuffer.Get().(*bytes.Buffer)
+	defer func() {
+		buffer.Reset()
+		user.Session.PoolBuffer.Put(buffer)
+	}()
 
 	for {
 		//readnSize, err := session.conn.Read(buffer)
-		readSize, err := user.Recv(buffer)
+		readSize, err := user.Recv(recvBuffer)
 		if err != nil && err != io.EOF {
 			//log.Panicln(err)
 			fmt.Println(err)
@@ -31,8 +38,27 @@ func handleSession(user *User) {
 			return
 		}
 
-		if readSize > 0 {
-			user.HandlePacket(buffer)
+		if readSize == 0 {
+			continue
+		}
+
+		{
+			buffer.Write(recvBuffer[:readSize])
+
+			bufferArray := buffer.Bytes()
+
+			header, err := Network.GetHeader(bufferArray[:])
+			if err != nil {
+				log.Panicln("read header")
+			}
+
+			if header.PacketSize > Network.MaxPacketSize {
+				panic("packet size larger than maxsize")
+			}
+
+			user.DispatchPacket(header.PacketID, bufferArray[Network.PacketHeaderLen:header.PacketSize])
+
+			buffer.Next(int(header.PacketSize))
 		}
 	}
 }

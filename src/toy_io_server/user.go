@@ -21,27 +21,13 @@ func (user *User) Init(session *Network.Session) {
 	user.Session = session
 }
 
-func (user *User) HandlePacket(bufferArray []byte) {
-	//부모안에서 처리후에, 자식의 함수로 virtual처럼 처리하고 싶은데 못했음. 방법 찾는중
-	//user.Session.HandlePacket(bufferArray)
-
-	//header빼오는 부분은 Session으로 감추고 싶다...
-	header, err := Network.GetHeader(bufferArray[:Network.MaxPacketSize])
-	if err != nil {
-		log.Panicln("read header")
-	}
-
-	user.OnReceived(header.PacketID, bufferArray, header.PacketSize)
-}
-
-// OnReceived dispatch packet.
-//func (session *Network.Session) OnReceived(protocolID PROTOCOL.ProtocolID, buffer []byte) {
-func (user *User) OnReceived(protocolID PROTOCOL.ProtocolID, buffer []byte, packetSize int32) {
+// DispatchPacket is dispatch packet.
+func (user *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
 	switch protocolID {
 	case PROTOCOL.ProtocolID_LoginReq:
 		{
 			req := &LobbyPacket.LoginReq{}
-			err := proto.Unmarshal(buffer[Network.PacketHeaderLen:packetSize], req)
+			err := proto.Unmarshal(buffer[:], req)
 			Util.ProcessError(err)
 			log.Printf("%s\n", req.String())
 
@@ -50,7 +36,7 @@ func (user *User) OnReceived(protocolID PROTOCOL.ProtocolID, buffer []byte, pack
 	case PROTOCOL.ProtocolID_LoginRes:
 		{
 			res := &LobbyPacket.LoginRes{}
-			err := proto.Unmarshal(buffer[Network.PacketHeaderLen:packetSize], res)
+			err := proto.Unmarshal(buffer[:], res)
 			Util.ProcessError(err)
 			log.Printf("%s\n", res.String())
 		}
