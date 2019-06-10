@@ -26,67 +26,67 @@ func GetSessionManager() *SessionManager {
 }
 
 // Init ...
-func (sessionManager *SessionManager) Init() {
+func (this *SessionManager) Init() {
 
-	sessionManager.userList = make(map[string]bool)
-	//sessionManager.userList = []string{}
-	sessionManager.uidList = make(map[string]int64)
-	sessionManager.beginUIDIndex = 2222
+	this.userList = make(map[string]bool)
+	//this.userList = []string{}
+	this.uidList = make(map[string]int64)
+	this.beginUIDIndex = 2222
 }
 
 // AddUser ...
-func (sessionManager *SessionManager) AddUser(name string) bool {
+func (this *SessionManager) AddUser(name string) bool {
 
-	sessionManager.Lock()
-	_, ok := sessionManager.userList[name]
+	this.Lock()
+	_, ok := this.userList[name]
 	if ok == false {
-		sessionManager.userList[name] = true
+		this.userList[name] = true
 
-		userCount := len(sessionManager.userList)
+		userCount := len(this.userList)
 		log.Printf("UserCount : %d", userCount)
 
-		sessionManager.Unlock()
+		this.Unlock()
 		return true
 	}
 
-	sessionManager.userList[name] = true
-	sessionManager.Unlock()
+	this.userList[name] = true
+	this.Unlock()
 	return true
 }
 
-func (sessionManager *SessionManager) RemoveUser(name string) bool {
-	if sessionManager.FindUser(name) == false {
+func (this *SessionManager) RemoveUser(name string) bool {
+	if this.FindUser(name) == false {
 		return false
 	}
 
-	delete(sessionManager.userList, name)
-	log.Println("user: %s removed from sessionManager", name)
+	delete(this.userList, name)
+	log.Println("user: %s removed from this", name)
 
 	return true
 }
 
 // FindUser ...
-func (sessionManager *SessionManager) FindUser(name string) bool {
+func (this *SessionManager) FindUser(name string) bool {
 
-	sessionManager.Lock()
-	_, ok := sessionManager.userList[name]
-	sessionManager.Unlock()
+	this.Lock()
+	_, ok := this.userList[name]
+	this.Unlock()
 
 	return ok
 }
 
 //GetUID ...
-func (sessionManager *SessionManager) GetUID(name string) int64 {
+func (this *SessionManager) GetUID(name string) int64 {
 
-	sessionManager.Lock()
-	if val, ok := sessionManager.uidList[name]; ok {
-		sessionManager.Unlock()
+	this.Lock()
+	if val, ok := this.uidList[name]; ok {
+		this.Unlock()
 		return val
 	}
 
-	count := len(sessionManager.uidList)
-	count = int(sessionManager.beginUIDIndex) + count
-	sessionManager.uidList[name] = int64(count)
-	sessionManager.Unlock()
+	count := len(this.uidList)
+	count = int(this.beginUIDIndex) + count
+	this.uidList[name] = int64(count)
+	this.Unlock()
 	return int64(count)
 }

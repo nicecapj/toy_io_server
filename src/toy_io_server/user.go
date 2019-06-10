@@ -17,12 +17,12 @@ type User struct {
 }
 
 // Init used for initialize of session
-func (user *User) Init(session *Network.Session) {
-	user.Session = session
+func (this *User) Init(session *Network.Session) {
+	this.Session = session
 }
 
 // DispatchPacket is dispatch packet.
-func (user *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+func (this *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
 	switch protocolID {
 	case PROTOCOL.ProtocolID_LoginReq:
 		{
@@ -31,7 +31,7 @@ func (user *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) 
 			Util.ProcessError(err)
 			log.Printf("%s\n", req.String())
 
-			user.OnLoginReq(req)
+			this.OnLoginReq(req)
 		}
 	case PROTOCOL.ProtocolID_LoginRes:
 		{
@@ -44,11 +44,11 @@ func (user *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) 
 }
 
 // OnLoginReq is handler for login request from client
-func (user *User) OnLoginReq(req *LobbyPacket.LoginReq) {
+func (this *User) OnLoginReq(req *LobbyPacket.LoginReq) {
 	sessionManager := Network.GetSessionManager()
 
 	name := req.GetName()
-	user.Name = name
+	this.Name = name
 
 	res := &LobbyPacket.LoginRes{}
 	if sessionManager.FindUser(name) {
@@ -59,5 +59,5 @@ func (user *User) OnLoginReq(req *LobbyPacket.LoginReq) {
 		res.RetCode = ReturnCode.ReturnCode_retOK
 		res.Uid = sessionManager.GetUID(name)
 	}
-	user.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
+	this.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
 }

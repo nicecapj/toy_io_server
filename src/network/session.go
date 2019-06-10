@@ -18,12 +18,12 @@ type Session struct {
 	sync.Mutex
 	Conn        net.Conn
 	isConnected bool
-	poolBuffer  sync.Pool
+	PoolBuffer  sync.Pool
 
 	Name string
 }
 
-// CreateSession make new session
+// CreateSession make new this
 func CreateSession(Conn net.Conn) *Session {
 	//newSession := new(Session)
 	newSession := &Session{}
@@ -40,11 +40,11 @@ func CreateSession(Conn net.Conn) *Session {
 }
 
 //InitConnection ...
-func (session *Session) InitConnection(conn net.Conn) {
-	session.Conn = conn
-	session.isConnected = true
+func (this *Session) InitConnection(conn net.Conn) {
+	this.Conn = conn
+	this.isConnected = true
 
-	session.poolBuffer = sync.Pool{
+	this.PoolBuffer = sync.Pool{
 		New: func() interface{} {
 			nb := new(bytes.Buffer)
 			return nb
@@ -52,7 +52,7 @@ func (session *Session) InitConnection(conn net.Conn) {
 	}
 }
 
-func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Message) {
+func (this *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Message) {
 
 	body, err := proto.Marshal(pb)
 	if err != nil {
@@ -63,23 +63,23 @@ func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Mess
 	header.PacketID = protocolID
 	header.PacketSize = PacketHeaderLen + int32(len(body))
 
-	buffer, err := session.SetHeader(header)
+	buffer, err := this.SetHeader(header)
 	if err != nil {
 		log.Panicln("set header")
 	}
 
 	defer func() {
 		buffer.Reset()
-		session.poolBuffer.Put(buffer)
+		this.PoolBuffer.Put(buffer)
 	}()
 
 	buffer.Write(body)
 
-	session.Send(buffer.Bytes())
+	this.Send(buffer.Bytes())
 }
 
-func (session *Session) SetHeader(header Header) (*bytes.Buffer, error) {
-	buffer := session.poolBuffer.Get().(*bytes.Buffer)
+func (this *Session) SetHeader(header Header) (*bytes.Buffer, error) {
+	buffer := this.PoolBuffer.Get().(*bytes.Buffer)
 
 	err := binary.Write(buffer, binary.LittleEndian, header)
 	if err != nil {
@@ -89,29 +89,7 @@ func (session *Session) SetHeader(header Header) (*bytes.Buffer, error) {
 	return buffer, err
 }
 
-func (session *Session) OnReceived(protocolID PROTOCOL.ProtocolID, buffer []byte) {
-}
-
-// Recv ...
-//func (session *Session) HandlePacket(packet []byte) {
-func (session *Session) HandlePacket(bufferArray []byte) {
-
-	//풀을 여기서는 안써도 되지 않을까. 괜히 복사나 한번 더 일어나지
-	// buffer := session.poolBuffer.Get().(*bytes.Buffer)
-	// defer func() {
-	// 	buffer.Reset()
-	// 	session.poolBuffer.Put(buffer)
-	// }()
-	// buffer.Write(packet[:MaxPacketSize])
-
-	// bufferArray := buffer.Bytes()
-	header, err := GetHeader(bufferArray[:MaxPacketSize])
-	if err != nil {
-		log.Panicln("read header")
-	}
-
-	//virtual처럼 동작하게 하고 싶은데?
-	session.OnReceived(header.PacketID, bufferArray)
+func (this *Session) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
 }
 
 func GetHeader(stream []byte) (Header, error) {
@@ -128,8 +106,8 @@ func GetHeader(stream []byte) (Header, error) {
 }
 
 //Send ...
-func (session *Session) Send(packet []byte) (int, error) {
-	readSize, err := session.Conn.Write([]byte(packet))
+func (this *Session) Send(packet []byte) (int, error) {
+	readSize, err := this.Conn.Write([]byte(packet))
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -137,11 +115,11 @@ func (session *Session) Send(packet []byte) (int, error) {
 }
 
 // Recv ...
-func (session *Session) Recv(packet []byte) (int, error) {
-	readSize, err := session.Conn.Read([]byte(packet))
+func (this *Session) Recv(packet []byte) (int, error) {
+	readSize, err := this.Conn.Read([]byte(packet))
 
 	if err != nil {
-		session.isConnected = false
+		this.isConnected = false
 
 		if err == io.ErrClosedPipe {
 
@@ -158,15 +136,15 @@ func (session *Session) Recv(packet []byte) (int, error) {
 }
 
 // IsConnected ...
-func (session *Session) IsConnected() bool {
+func (this *Session) IsConnected() bool {
 	//conn에 이미 이런게 있지 않을까?
-	return session.isConnected
+	return this.isConnected
 }
 
 //Close ...
-func (session *Session) Close() {
-	session.Conn.Close()
+func (this *Session) Close() {
+	this.Conn.Close()
 
 	SessionManager := GetSessionManager()
-	SessionManager.RemoveUser(session.Name)
+	SessionManager.RemoveUser(this.Name)
 }
