@@ -4,10 +4,51 @@ package packet.lobby;
 import "returncode.proto";
 
 message LoginReq {	
-	string name = 1;      
+	string name = 1;
 }
 
 message LoginRes {	
 	returncode.ReturnCode retCode = 1;
 	int64 uid = 2;
+	string name = 3;
+}
+
+message Location{
+	int32 x = 1;
+	int32 y = 2;
+	int32 z = 3;
+}
+
+message UserInfo{
+	int64 uid = 1;
+	string name = 2;
+	Location location = 3;
+}
+
+message RoomEnterReq {	
+	int64 uid = 1;
+}
+
+message RoomEnterRes {
+	returncode.ReturnCode retCode = 1;		
+}
+
+message RoomEnterNfy {	
+	repeated UserInfo UserInfoList = 1;
+}
+
+message ReadyForGameReq {	
+	string name = 1;      
+}
+
+message RoomLeaveReq {	
+	int64 uid = 1;
+}
+
+message RoomLeaveRes {	
+	returncode.ReturnCode retCode = 1;
+}
+
+message RoomLeaveNfy {	
+	repeated UserInfo UserInfoList = 1;
 }

@@ -6,4 +6,11 @@ enum ProtocolID {
 	ProtocolBegin = 0;
 	LoginReq = 1;
 	LoginRes = 2;
+	RoomEnterReq = 3;
+	RoomEnterRes = 4;
+	RoomEnterNfy = 5;
+	ReadyForGameReq = 6;
+	RoomLeaveReq = 7;
+	RoomLeaveRes = 8;
+	RoomLeaveNfy = 9;
 }

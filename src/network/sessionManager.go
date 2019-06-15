@@ -3,13 +3,17 @@ package network
 import (
 	"log"
 	"net"
+	PROTOCOL "packet_protocol"
 	"sync"
+
+	"github.com/golang/protobuf/proto"
 )
 
 //SessionManager ...
 type SessionManager struct {
 	sync.Mutex
-	sessionList map[net.Conn]interface{}
+	//sessionList map[net.Conn]interface{}
+	sessionList map[net.Conn]*Session
 }
 
 var sessionManagerInstace *SessionManager
@@ -27,7 +31,7 @@ func GetSessionManager() *SessionManager {
 // Init ...
 func (this *SessionManager) Init() {
 
-	this.sessionList = make(map[net.Conn]interface{})
+	this.sessionList = make(map[net.Conn]*Session)
 }
 
 // CreateSession make new this
@@ -86,4 +90,12 @@ func (this *SessionManager) FindSession(session net.Conn) bool {
 	this.Unlock()
 
 	return ok
+}
+
+func (this *SessionManager) Broadcast(protocolID PROTOCOL.ProtocolID, pb proto.Message) {
+	for _, session := range this.sessionList {
+		if session != nil {
+			session.SendPacket(protocolID, pb)
+		}
+	}
 }
