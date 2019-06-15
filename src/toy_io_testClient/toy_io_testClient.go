@@ -15,63 +15,68 @@ func main() {
 	conn, err := net.Dial("tcp", "127.0.0.1:6666")
 	util.ProcessError(err)
 
-	session := Network.CreateSession(conn)
+	sessionManager := Network.GetSessionManager() //no need for client, but is used for creation session by server routine.
+	session := sessionManager.CreateSession(conn)
+
 	clientSession := &ClientSession{}
 	clientSession.Init(session)
 
 	defer clientSession.Close()
 
-	for {
-		//send
-		name := util.GetRandomName()
-		clientSession.reqestLogin(name)
+	//send
+	name := util.GetRandomName()
+	clientSession.RequestLoginReq(name)
 
-		//recv
-		recvBuffer := make([]byte, 4096)
+	//recv
+	recvBuffer := make([]byte, 4096)
 
-		buffer := clientSession.PoolBuffer.Get().(*bytes.Buffer)
-		defer func() {
-			buffer.Reset()
-			clientSession.PoolBuffer.Put(buffer)
-		}()
+	buffer := clientSession.PoolBuffer.Get().(*bytes.Buffer)
+	defer func() {
+		buffer.Reset()
+		clientSession.PoolBuffer.Put(buffer)
+	}()
 
-		//readnSize, err := session.conn.Read(buffer)
-		readSize, err := session.Recv(recvBuffer)
-		if err != nil && err != io.EOF {
-			//log.Panicln(err)
-			fmt.Println(err)
-			return
-		} else if err == io.EOF {
-			log.Printf("Close connection\n")
-			return
-		} else if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		if readSize == 0 {
-			continue
-		}
-
-		{
-			buffer.Write(recvBuffer[:readSize])
-
-			bufferArray := buffer.Bytes()
-
-			header, err := Network.GetHeader(bufferArray[:])
-			if err != nil {
-				log.Panicln("read header")
+	//recv
+	func(buffer *bytes.Buffer) {
+		for {
+			//readnSize, err := session.conn.Read(buffer)
+			readSize, err := session.Recv(recvBuffer)
+			if err != nil && err != io.EOF {
+				//log.Panicln(err)
+				fmt.Println(err)
+				return
+			} else if err == io.EOF {
+				log.Printf("Close connection\n")
+				return
+			} else if err != nil {
+				fmt.Println(err)
+				return
 			}
 
-			if header.PacketSize > Network.MaxPacketSize {
-				panic("packet size larger than maxsize")
+			if readSize == 0 {
+				continue
 			}
 
-			clientSession.DispatchPacket(header.PacketID, bufferArray[Network.PacketHeaderLen:header.PacketSize])
+			{
+				buffer.Write(recvBuffer[:readSize])
 
-			buffer.Next(int(header.PacketSize))
+				bufferArray := buffer.Bytes()
+
+				header, err := Network.GetHeader(bufferArray[:])
+				if err != nil {
+					log.Panicln("read header")
+				}
+
+				if header.PacketSize > Network.MaxPacketSize {
+					panic("packet size larger than maxsize")
+				}
+
+				clientSession.DispatchPacket(header.PacketID, bufferArray[Network.PacketHeaderLen:header.PacketSize])
+
+				buffer.Next(int(header.PacketSize))
+			}
 		}
-	}
+	}(buffer)
 
 	// //recv
 	// go func(session *ClientSession) {
