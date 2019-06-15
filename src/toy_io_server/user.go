@@ -17,12 +17,12 @@ type User struct {
 }
 
 // Init used for initialize of session
-func (this *User) Init(session *Network.Session) {
-	this.Session = session
+func (user *User) Init(session *Network.Session) {
+	user.Session = session
 }
 
 // DispatchPacket is dispatch packet.
-func (this *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+func (user *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
 	switch protocolID {
 	case PROTOCOL.ProtocolID_LoginReq:
 		{
@@ -31,26 +31,62 @@ func (this *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) 
 			Util.ProcessError(err)
 			log.Printf("%s\n", req.String())
 
-			this.OnLoginReq(req)
+			user.OnLoginReq(req)
+		}
+
+	case PROTOCOL.ProtocolID_RoomEnterReq:
+		{
+			req := &LobbyPacket.RoomEnterReq{}
+			err := proto.Unmarshal(buffer[:], req)
+			Util.ProcessError(err)
+			log.Printf("%s\n", req.String())
+
+			user.OnRoomEnterReq(req)
 		}
 	}
 }
 
 // OnLoginReq is handler for login request from client
-func (this *User) OnLoginReq(req *LobbyPacket.LoginReq) {
+func (user *User) OnLoginReq(req *LobbyPacket.LoginReq) {
 	accountManager := Network.GetAccountManager()
 
 	name := req.GetName()
-	this.Name = name
+	user.Name = name
 
 	res := &LobbyPacket.LoginRes{}
 	if accountManager.FindUser(name) {
 		res.RetCode = ReturnCode.ReturnCode_retExist
-		res.Uid = accountManager.GetUID(name)
 	} else {
 		accountManager.AddUser(name)
 		res.RetCode = ReturnCode.ReturnCode_retOK
-		res.Uid = accountManager.GetUID(name)
 	}
-	this.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
+
+	user.Uid = accountManager.GetUID(name)
+	res.Uid = user.Uid
+
+	user.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
+}
+
+// OnRoomEnterReq ...
+func (user *User) OnRoomEnterReq(req *LobbyPacket.RoomEnterReq) {
+	res := &LobbyPacket.RoomEnterRes{}
+
+	roomManager := GetRoomManager()
+	room := roomManager.GetLeisuerlyRoom()
+	if room != nil {
+		if room.Enter(user) == true {
+			res.RetCode = ReturnCode.ReturnCode_retOK
+			res.RoomID = room.RoomID
+			res.RoomName = room.Name
+		} else {
+			//fail to enter room
+			res.RetCode = ReturnCode.ReturnCode_retFail
+		}
+
+	} else {
+		//not enought room.
+		res.RetCode = ReturnCode.ReturnCode_retFail
+	}
+
+	user.SendPacket(PROTOCOL.ProtocolID_RoomEnterRes, res)
 }

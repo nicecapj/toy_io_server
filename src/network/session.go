@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	PROTOCOL "packet_protocol"
+	"reflect"
 	"sync"
 
 	"github.com/golang/protobuf/proto"
@@ -21,6 +22,7 @@ type Session struct {
 	PoolBuffer  sync.Pool
 
 	Name string
+	Uid  int64
 }
 
 //InitConnection ...
@@ -42,6 +44,10 @@ func (this *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Message
 	if err != nil {
 		log.Panicln(err)
 	}
+
+	log.Print(reflect.TypeOf(pb))
+
+	log.Printf("Send : %s\n", pb.String())
 
 	var header Header
 	header.PacketID = protocolID

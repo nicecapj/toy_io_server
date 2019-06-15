@@ -76,8 +76,11 @@ func (this *SessionManager) RemoveSession(session *Session) bool {
 		return false
 	}
 
-	log.Println("user: %s removed from this", session.Name)
+	log.Printf("user: %s removed from sessionManager\n", session.Name)
+
+	this.Lock()
 	delete(this.sessionList, session.Conn)
+	this.Unlock()
 
 	return true
 }

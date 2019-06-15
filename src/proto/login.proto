@@ -31,6 +31,8 @@ message RoomEnterReq {
 
 message RoomEnterRes {
 	returncode.ReturnCode retCode = 1;		
+	int32 roomID = 2;
+	string roomName = 3;
 }
 
 message RoomEnterNfy {	
@@ -38,7 +40,7 @@ message RoomEnterNfy {
 }
 
 message ReadyForGameReq {	
-	string name = 1;      
+	int64 uid = 1;
 }
 
 message RoomLeaveReq {	

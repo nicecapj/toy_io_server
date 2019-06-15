@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// ProcessError ...
 func ProcessError(err error) {
 	if err != nil {
 		panic(err)
@@ -13,6 +14,7 @@ func ProcessError(err error) {
 	}
 }
 
+// RecoverError ...
 func RecoverError() {
 	err := recover()
 	fmt.Println(err)
@@ -33,4 +35,11 @@ func GetRandomName() string {
 	}
 
 	return name
+}
+
+// GetRandomUIntNumber ...
+func GetRandomUIntNumber(maxNumber int32) int32 {
+	seedValue := time.Now().Unix()
+	rand.Seed(seedValue)
+	return rand.Int31n(maxNumber + 1)
 }
