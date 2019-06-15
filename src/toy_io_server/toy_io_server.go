@@ -36,9 +36,15 @@ func handleSession(user *User) {
 		} else if err != nil {
 			fmt.Println(err)
 			return
+		} else {
+			//이 경우는 뭐가 있을까
 		}
 
 		if readSize == 0 {
+			continue
+		}
+
+		if Network.PacketHeaderLen > readSize {
 			continue
 		}
 
@@ -70,7 +76,7 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	log.Printf("GOMAX Proc : %d\n", runtime.NumCPU())
 
-	//sessionManager := Network.GetSessionManager()
+	sessionManager := Network.GetSessionManager()
 
 	listener, err := net.Listen("tcp", ":6666")
 	util.ProcessError(err)
@@ -80,7 +86,7 @@ func main() {
 		conn, err := listener.Accept()
 		util.ProcessError(err)
 
-		session := Network.CreateSession(conn)
+		session := sessionManager.CreateSession(conn)
 		user := &User{}
 		user.Init(session)
 

@@ -38,19 +38,19 @@ func (this *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) 
 
 // OnLoginReq is handler for login request from client
 func (this *User) OnLoginReq(req *LobbyPacket.LoginReq) {
-	sessionManager := Network.GetSessionManager()
+	accountManager := Network.GetAccountManager()
 
 	name := req.GetName()
 	this.Name = name
 
 	res := &LobbyPacket.LoginRes{}
-	if sessionManager.FindUser(name) {
+	if accountManager.FindUser(name) {
 		res.RetCode = ReturnCode.ReturnCode_retExist
-		res.Uid = sessionManager.GetUID(name)
+		res.Uid = accountManager.GetUID(name)
 	} else {
-		sessionManager.AddUser(name)
+		accountManager.AddUser(name)
 		res.RetCode = ReturnCode.ReturnCode_retOK
-		res.Uid = sessionManager.GetUID(name)
+		res.Uid = accountManager.GetUID(name)
 	}
 	this.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
 }

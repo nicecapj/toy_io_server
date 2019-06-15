@@ -2,15 +2,14 @@ package network
 
 import (
 	"log"
+	"net"
 	"sync"
 )
 
 //SessionManager ...
 type SessionManager struct {
 	sync.Mutex
-	userList      map[string]bool
-	uidList       map[string]int64
-	beginUIDIndex int64
+	sessionList map[net.Conn]interface{}
 }
 
 var sessionManagerInstace *SessionManager
@@ -28,65 +27,63 @@ func GetSessionManager() *SessionManager {
 // Init ...
 func (this *SessionManager) Init() {
 
-	this.userList = make(map[string]bool)
-	//this.userList = []string{}
-	this.uidList = make(map[string]int64)
-	this.beginUIDIndex = 2222
+	this.sessionList = make(map[net.Conn]interface{})
+}
+
+// CreateSession make new this
+func (this *SessionManager) CreateSession(Conn net.Conn) *Session {
+	//newSession := new(Session)
+	newSession := &Session{}
+
+	if newSession != nil {
+
+		log.Printf("New session : %s", Conn.RemoteAddr())
+		//log.Printf("New session : %s", Conn.LocalAddr())
+
+		newSession.InitConnection(Conn)
+		this.AddSession(newSession)
+	}
+
+	return newSession
 }
 
 // AddUser ...
-func (this *SessionManager) AddUser(name string) bool {
+func (this *SessionManager) AddSession(session *Session) bool {
 
 	this.Lock()
-	_, ok := this.userList[name]
+	_, ok := this.sessionList[session.Conn]
 	if ok == false {
-		this.userList[name] = true
+		this.sessionList[session.Conn] = session
 
-		userCount := len(this.userList)
+		userCount := len(this.sessionList)
 		log.Printf("UserCount : %d", userCount)
 
 		this.Unlock()
 		return true
 	}
 
-	this.userList[name] = true
+	this.sessionList[session.Conn] = session
 	this.Unlock()
 	return true
 }
 
-func (this *SessionManager) RemoveUser(name string) bool {
-	if this.FindUser(name) == false {
+func (this *SessionManager) RemoveSession(session *Session) bool {
+	if this.FindSession(session.Conn) == false {
 		return false
 	}
 
-	delete(this.userList, name)
-	log.Println("user: %s removed from this", name)
+	log.Println("user: %s removed from this", session.Name)
+	delete(this.sessionList, session.Conn)
 
 	return true
 }
 
 // FindUser ...
-func (this *SessionManager) FindUser(name string) bool {
+func (this *SessionManager) FindSession(session net.Conn) bool {
 
 	this.Lock()
-	_, ok := this.userList[name]
+	_, ok := this.sessionList[session]
 	this.Unlock()
 
 	return ok
-}
-
-//GetUID ...
-func (this *SessionManager) GetUID(name string) int64 {
-
-	this.Lock()
-	if val, ok := this.uidList[name]; ok {
-		this.Unlock()
-		return val
-	}
-
-	count := len(this.uidList)
-	count = int(this.beginUIDIndex) + count
-	this.uidList[name] = int64(count)
-	this.Unlock()
-	return int64(count)
 }

@@ -23,22 +23,6 @@ type Session struct {
 	Name string
 }
 
-// CreateSession make new this
-func CreateSession(Conn net.Conn) *Session {
-	//newSession := new(Session)
-	newSession := &Session{}
-
-	if newSession != nil {
-
-		log.Printf("New session : %s", Conn.RemoteAddr())
-		//log.Printf("New session : %s", Conn.LocalAddr())
-
-		newSession.InitConnection(Conn)
-	}
-
-	return newSession
-}
-
 //InitConnection ...
 func (this *Session) InitConnection(conn net.Conn) {
 	this.Conn = conn
@@ -146,5 +130,5 @@ func (this *Session) Close() {
 	this.Conn.Close()
 
 	SessionManager := GetSessionManager()
-	SessionManager.RemoveUser(this.Name)
+	SessionManager.RemoveSession(this)
 }
