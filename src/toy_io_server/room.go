@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/list"
+	LobbyPacket "packet_lobby"
 	PROTOCOL "packet_protocol"
 	"sync"
 
@@ -26,24 +27,21 @@ func (room *Room) Enter(session *User) bool {
 		return false
 	}
 
-	//packet := &LobbyPacket.RoomEnterNfy{}
+	packet := &LobbyPacket.RoomEnterNfy{}
 
-	//userCount := room.userList.Len()
-	//packet.UserInfoList = make([]*LobbyPacket.UserInfo, userCount)
+	for e := room.userList.Back(); e != nil; e = e.Prev() {
+		user := e.Value.(*User)
 
-	// for e := room.userList.Back(); e != nil; e = e.Prev() {
-	// 	user := e.Value.(*User)
+		userInfo := &LobbyPacket.UserInfo{
+			Uid:      user.Uid,
+			Name:     user.Name,
+			Location: &LobbyPacket.Location{},
+		}
 
-	// 	userInfo := &LobbyPacket.UserInfo{
-	// 		Uid:      user.Uid,
-	// 		Name:     user.Name,
-	// 		Location: &LobbyPacket.Location{},
-	// 	}
+		packet.UserInfoList = append(packet.UserInfoList, userInfo)
+	}
 
-	// 	packet.UserInfoList = append(packet.UserInfoList, userInfo)
-	// }
-
-	//room.Broadcast(session, PROTOCOL.ProtocolID_RoomEnterNfy, packet)
+	room.Broadcast(session, PROTOCOL.ProtocolID_RoomEnterNfy, packet)
 
 	return true
 }
