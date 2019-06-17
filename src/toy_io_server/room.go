@@ -68,6 +68,10 @@ func (room *Room) Enter(session *User) bool {
 
 func (room *Room) Leave(session *User) {
 	if room.IsExistUser(session) {
+		room.deleteUser(session)
+
+		session.SetRoom(nil)
+
 		packet := &LobbyPacket.RoomLeaveRes{}
 		packet.RetCode = ReturnCode.ReturnCode_retOK
 		session.SendPacket(PROTOCOL.ProtocolID_RoomLeaveRes, packet)
@@ -86,10 +90,6 @@ func (room *Room) Leave(session *User) {
 		}
 
 		room.Broadcast(session, PROTOCOL.ProtocolID_RoomLeaveNfy, nfy)
-
-		room.Lock()
-		room.deleteUser(session)
-		room.Unlock()
 
 		log.Printf("[Room] User %s left from %s", session.Name, room.Name)
 	}

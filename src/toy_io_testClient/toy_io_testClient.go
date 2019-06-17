@@ -7,8 +7,24 @@ import (
 	"io"
 	"log"
 	"net"
+	"time"
 	"util"
 )
+
+func testPacketEnterAndLeaveRoom(client *ClientSession) {
+	timer := time.NewTimer(1000 * time.Millisecond)
+	go func() {
+		<-timer.C
+
+		if client.roomID != 0 {
+			client.RequestRoomLeaveReq()
+		} else {
+			client.RequestRoomEnterReq()
+		}
+
+		go testPacketEnterAndLeaveRoom(client)
+	}()
+}
 
 func main() {
 	defer util.RecoverError()
@@ -38,6 +54,12 @@ func main() {
 	defer func() {
 		buffer.Reset()
 		clientSession.PoolBuffer.Put(buffer)
+	}()
+
+	timer := time.NewTimer(3 * time.Second)
+	go func() {
+		<-timer.C
+		testPacketEnterAndLeaveRoom(clientSession)
 	}()
 
 	//recv

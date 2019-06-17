@@ -121,13 +121,11 @@ func (user *User) OnRoomLeaveReq(req *LobbyPacket.RoomLeaveReq) {
 	roomManager := GetRoomManager()
 	room := roomManager.FindRoom(req.RoomID)
 	if room != nil {
-		res.RetCode = ReturnCode.ReturnCode_retOK
+		room.Leave(user)
 	} else {
-		//can`t not find room.
+		//error packet : can`t not find room.
 		res.RetCode = ReturnCode.ReturnCode_retFail
 	}
-
-	user.SendPacket(PROTOCOL.ProtocolID_RoomLeaveRes, res)
 }
 
 // OnReadyForGameReq. if do not received from user, ignored from all logic
@@ -137,5 +135,7 @@ func (user *User) OnReadyForGameReq(req *LobbyPacket.ReadyForGameReq) {
 }
 
 func (user *User) SetRoom(room *Room) {
+	user.Lock()
 	user.enteredRoom = room
+	user.Unlock()
 }
