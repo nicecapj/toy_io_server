@@ -19,6 +19,7 @@ type SessionManager struct {
 var sessionManagerInstace *SessionManager
 var onceSessionManager sync.Once
 
+// GetSessionManager is singleton
 func GetSessionManager() *SessionManager {
 	onceSessionManager.Do(func() {
 		sessionManagerInstace = &SessionManager{}
@@ -29,13 +30,13 @@ func GetSessionManager() *SessionManager {
 }
 
 // Init ...
-func (this *SessionManager) Init() {
+func (sessionManager *SessionManager) Init() {
 
-	this.sessionList = make(map[net.Conn]*Session)
+	sessionManager.sessionList = make(map[net.Conn]*Session)
 }
 
-// CreateSession make new this
-func (this *SessionManager) CreateSession(Conn net.Conn) *Session {
+// CreateSession make new sessionManager
+func (sessionManager *SessionManager) CreateSession(Conn net.Conn) *Session {
 	//newSession := new(Session)
 	newSession := &Session{}
 
@@ -45,58 +46,60 @@ func (this *SessionManager) CreateSession(Conn net.Conn) *Session {
 		//log.Printf("New session : %s", Conn.LocalAddr())
 
 		newSession.InitConnection(Conn)
-		this.AddSession(newSession)
+		sessionManager.AddSession(newSession)
 	}
 
 	return newSession
 }
 
-// AddUser ...
-func (this *SessionManager) AddSession(session *Session) bool {
+// AddSession is ...
+func (sessionManager *SessionManager) AddSession(session *Session) bool {
 
-	this.Lock()
-	_, ok := this.sessionList[session.Conn]
+	sessionManager.Lock()
+	_, ok := sessionManager.sessionList[session.Conn]
 	if ok == false {
-		this.sessionList[session.Conn] = session
+		sessionManager.sessionList[session.Conn] = session
 
-		userCount := len(this.sessionList)
+		userCount := len(sessionManager.sessionList)
 		log.Printf("UserCount : %d", userCount)
 
-		this.Unlock()
+		sessionManager.Unlock()
 		return true
 	}
 
-	this.sessionList[session.Conn] = session
-	this.Unlock()
+	sessionManager.sessionList[session.Conn] = session
+	sessionManager.Unlock()
 	return true
 }
 
-func (this *SessionManager) RemoveSession(session *Session) bool {
-	if this.FindSession(session.Conn) == false {
+// RemoveSession is ...
+func (sessionManager *SessionManager) RemoveSession(session *Session) bool {
+	if sessionManager.FindSession(session.Conn) == false {
 		return false
 	}
 
 	log.Printf("user: %s removed from sessionManager\n", session.Name)
 
-	this.Lock()
-	delete(this.sessionList, session.Conn)
-	this.Unlock()
+	sessionManager.Lock()
+	delete(sessionManager.sessionList, session.Conn)
+	sessionManager.Unlock()
 
 	return true
 }
 
-// FindUser ...
-func (this *SessionManager) FindSession(session net.Conn) bool {
+// FindSession ...
+func (sessionManager *SessionManager) FindSession(session net.Conn) bool {
 
-	this.Lock()
-	_, ok := this.sessionList[session]
-	this.Unlock()
+	sessionManager.Lock()
+	_, ok := sessionManager.sessionList[session]
+	sessionManager.Unlock()
 
 	return ok
 }
 
-func (this *SessionManager) Broadcast(protocolID PROTOCOL.ProtocolID, pb proto.Message) {
-	for _, session := range this.sessionList {
+// Broadcast is ...
+func (sessionManager *SessionManager) Broadcast(protocolID PROTOCOL.ProtocolID, pb proto.Message) {
+	for _, session := range sessionManager.sessionList {
 		if session != nil {
 			session.SendPacket(protocolID, pb)
 		}

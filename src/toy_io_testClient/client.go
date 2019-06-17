@@ -12,18 +12,18 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-// User is session + logic packet
+// ClientSession is session + logic packet
 type ClientSession struct {
 	*Network.Session
 }
 
 // Init used for initialize of session
-func (this *ClientSession) Init(session *Network.Session) {
-	this.Session = session
+func (clientSession *ClientSession) Init(session *Network.Session) {
+	clientSession.Session = session
 }
 
 // DispatchPacket is dispatch packet.
-func (this *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+func (clientSession *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
 	switch protocolID {
 	case PROTOCOL.ProtocolID_LoginRes:
 		{
@@ -35,8 +35,8 @@ func (this *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer
 			log.Printf("%s\n", res.String())
 
 			if res.RetCode != RETURNCODE.ReturnCode_retFail {
-				this.Uid = res.Uid
-				this.RequestRoomEnterReq(this.Uid)
+				clientSession.UID = res.Uid
+				clientSession.RequestRoomEnterReq(clientSession.UID)
 			}
 		}
 	case PROTOCOL.ProtocolID_RoomEnterRes:
@@ -49,7 +49,7 @@ func (this *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer
 			log.Printf("%s\n", res.String())
 
 			if res.RetCode != RETURNCODE.ReturnCode_retFail {
-				this.RequestReadyForGameReq(this.Uid) //Considered to be loaded
+				clientSession.RequestReadyForGameReq(clientSession.UID) //Considered to be loaded
 			}
 		}
 	case PROTOCOL.ProtocolID_RoomEnterNfy:
@@ -68,26 +68,30 @@ func (this *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer
 	}
 }
 
-//-----------------------------------------------------------------------------
-func (this *ClientSession) RequestLoginReq(userName string) {
+// RequestLoginReq is ...
+func (clientSession *ClientSession) RequestLoginReq(userName string) {
 
 	req := &LobbyPacket.LoginReq{Name: userName}
-	this.SendPacket(PROTOCOL.ProtocolID_LoginReq, req)
+	clientSession.SendPacket(PROTOCOL.ProtocolID_LoginReq, req)
 }
 
-func (this *ClientSession) RequestRoomEnterReq(uid int64) {
+// RequestRoomEnterReq ...
+func (clientSession *ClientSession) RequestRoomEnterReq(uid int64) {
 
 	req := &LobbyPacket.RoomEnterReq{Uid: uid}
-	this.SendPacket(PROTOCOL.ProtocolID_RoomEnterReq, req)
+	clientSession.SendPacket(PROTOCOL.ProtocolID_RoomEnterReq, req)
 }
 
-func (this *ClientSession) RequestReadyForGameReq(uid int64) {
+// RequestReadyForGameReq will request to server after client ready to play and receive packet from server(when client loaded c omplete map and game dates)
+func (clientSession *ClientSession) RequestReadyForGameReq(uid int64) {
 
 	req := &LobbyPacket.ReadyForGameReq{Uid: uid}
-	this.SendPacket(PROTOCOL.ProtocolID_ReadyForGameReq, req)
+	clientSession.SendPacket(PROTOCOL.ProtocolID_ReadyForGameReq, req)
 }
-func (this *ClientSession) RequestRoomLeaveReq(uid int64) {
+
+// RequestRoomLeaveReq ...
+func (clientSession *ClientSession) RequestRoomLeaveReq(uid int64) {
 
 	req := &LobbyPacket.RoomLeaveReq{Uid: uid}
-	this.SendPacket(PROTOCOL.ProtocolID_RoomLeaveRes, req)
+	clientSession.SendPacket(PROTOCOL.ProtocolID_RoomLeaveRes, req)
 }

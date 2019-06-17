@@ -33,7 +33,7 @@ func (room *Room) Enter(session *User) bool {
 		user := e.Value.(*User)
 
 		userInfo := &LobbyPacket.UserInfo{
-			Uid:      user.Uid,
+			Uid:      user.UID,
 			Name:     user.Name,
 			Location: &LobbyPacket.Location{},
 		}

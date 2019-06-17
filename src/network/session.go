@@ -22,15 +22,15 @@ type Session struct {
 	PoolBuffer  sync.Pool
 
 	Name string
-	Uid  int64
+	UID  int64
 }
 
 //InitConnection ...
-func (this *Session) InitConnection(conn net.Conn) {
-	this.Conn = conn
-	this.isConnected = true
+func (session *Session) InitConnection(conn net.Conn) {
+	session.Conn = conn
+	session.isConnected = true
 
-	this.PoolBuffer = sync.Pool{
+	session.PoolBuffer = sync.Pool{
 		New: func() interface{} {
 			nb := new(bytes.Buffer)
 			return nb
@@ -38,7 +38,8 @@ func (this *Session) InitConnection(conn net.Conn) {
 	}
 }
 
-func (this *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Message) {
+// SendPacket ...
+func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Message) {
 
 	body, err := proto.Marshal(pb)
 	if err != nil {
@@ -53,23 +54,24 @@ func (this *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Message
 	header.PacketID = protocolID
 	header.PacketSize = PacketHeaderLen + int32(len(body))
 
-	buffer, err := this.SetHeader(header)
+	buffer, err := session.SetHeader(header)
 	if err != nil {
 		log.Panicln("set header")
 	}
 
 	defer func() {
 		buffer.Reset()
-		this.PoolBuffer.Put(buffer)
+		session.PoolBuffer.Put(buffer)
 	}()
 
 	buffer.Write(body)
 
-	this.Send(buffer.Bytes())
+	session.Send(buffer.Bytes())
 }
 
-func (this *Session) SetHeader(header Header) (*bytes.Buffer, error) {
-	buffer := this.PoolBuffer.Get().(*bytes.Buffer)
+// SetHeader ...
+func (session *Session) SetHeader(header Header) (*bytes.Buffer, error) {
+	buffer := session.PoolBuffer.Get().(*bytes.Buffer)
 
 	err := binary.Write(buffer, binary.LittleEndian, header)
 	if err != nil {
@@ -79,9 +81,11 @@ func (this *Session) SetHeader(header Header) (*bytes.Buffer, error) {
 	return buffer, err
 }
 
-func (this *Session) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+// DispatchPacket ...
+func (session *Session) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
 }
 
+// GetHeader ...
 func GetHeader(stream []byte) (Header, error) {
 
 	var header Header
@@ -96,8 +100,8 @@ func GetHeader(stream []byte) (Header, error) {
 }
 
 //Send ...
-func (this *Session) Send(packet []byte) (int, error) {
-	readSize, err := this.Conn.Write([]byte(packet))
+func (session *Session) Send(packet []byte) (int, error) {
+	readSize, err := session.Conn.Write([]byte(packet))
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -105,11 +109,11 @@ func (this *Session) Send(packet []byte) (int, error) {
 }
 
 // Recv ...
-func (this *Session) Recv(packet []byte) (int, error) {
-	readSize, err := this.Conn.Read([]byte(packet))
+func (session *Session) Recv(packet []byte) (int, error) {
+	readSize, err := session.Conn.Read([]byte(packet))
 
 	if err != nil {
-		this.isConnected = false
+		session.isConnected = false
 
 		if err == io.ErrClosedPipe {
 
@@ -126,15 +130,15 @@ func (this *Session) Recv(packet []byte) (int, error) {
 }
 
 // IsConnected ...
-func (this *Session) IsConnected() bool {
+func (session *Session) IsConnected() bool {
 	//conn에 이미 이런게 있지 않을까?
-	return this.isConnected
+	return session.isConnected
 }
 
 //Close ...
-func (this *Session) Close() {
-	this.Conn.Close()
+func (session *Session) Close() {
+	session.Conn.Close()
 
 	SessionManager := GetSessionManager()
-	SessionManager.RemoveSession(this)
+	SessionManager.RemoveSession(session)
 }

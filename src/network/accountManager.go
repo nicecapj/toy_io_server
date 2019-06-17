@@ -13,80 +13,82 @@ type AccountManager struct {
 	beginUIDIndex int64
 }
 
-var AccountManagerInstace *AccountManager
+var accountManagerInstace *AccountManager
 var onceAccountManager sync.Once
 
+// GetAccountManager is singleton
 func GetAccountManager() *AccountManager {
 	onceAccountManager.Do(func() {
-		AccountManagerInstace = &AccountManager{}
-		AccountManagerInstace.Init()
+		accountManagerInstace = &AccountManager{}
+		accountManagerInstace.Init()
 	})
 
-	return AccountManagerInstace
+	return accountManagerInstace
 }
 
 // Init ...
-func (this *AccountManager) Init() {
+func (accountManager *AccountManager) Init() {
 
-	this.userList = make(map[string]bool)
-	//this.userList = []string{}
-	this.uidList = make(map[string]int64)
-	this.beginUIDIndex = 2222
+	accountManager.userList = make(map[string]bool)
+	//accountManager.userList = []string{}
+	accountManager.uidList = make(map[string]int64)
+	accountManager.beginUIDIndex = 2222
 }
 
 // AddUser ...
-func (this *AccountManager) AddUser(name string) bool {
+func (accountManager *AccountManager) AddUser(name string) bool {
 
-	this.Lock()
-	_, ok := this.userList[name]
+	accountManager.Lock()
+	_, ok := accountManager.userList[name]
 	if ok == false {
-		this.userList[name] = true
+		accountManager.userList[name] = true
 
-		userCount := len(this.userList)
+		userCount := len(accountManager.userList)
 		log.Printf("UserCount : %d", userCount)
 
-		this.Unlock()
+		accountManager.Unlock()
 		return true
 	}
 
-	this.userList[name] = true
-	this.Unlock()
+	accountManager.userList[name] = true
+	accountManager.Unlock()
 	return true
 }
 
-func (this *AccountManager) RemoveUser(name string) bool {
-	if this.FindUser(name) == false {
+// RemoveUser is ...
+func (accountManager *AccountManager) RemoveUser(name string) bool {
+	if accountManager.FindUser(name) == false {
 		return false
 	}
 
-	delete(this.userList, name)
-	log.Println("user: %s removed from this", name)
+	delete(accountManager.userList, name)
+	log.Printf("user: %s removed from accountManager\n", name)
 
 	return true
 }
 
 // FindUser ...
-func (this *AccountManager) FindUser(name string) bool {
+func (accountManager *AccountManager) FindUser(name string) bool {
 
-	this.Lock()
-	_, ok := this.userList[name]
-	this.Unlock()
+	accountManager.Lock()
+	_, ok := accountManager.userList[name]
+	accountManager.Unlock()
 
 	return ok
 }
 
 //GetUID ...
-func (this *AccountManager) GetUID(name string) int64 {
+func (accountManager *AccountManager) GetUID(name string) int64 {
 
-	this.Lock()
-	if val, ok := this.uidList[name]; ok {
-		this.Unlock()
+	accountManager.Lock()
+	if val, ok := accountManager.uidList[name]; ok {
+		accountManager.Unlock()
 		return val
 	}
 
-	count := len(this.uidList)
-	count = int(this.beginUIDIndex) + count
-	this.uidList[name] = int64(count)
-	this.Unlock()
+	count := len(accountManager.uidList)
+	count = int(accountManager.beginUIDIndex) + count
+	accountManager.uidList[name] = int64(count)
+	accountManager.Unlock()
 	return int64(count)
 }

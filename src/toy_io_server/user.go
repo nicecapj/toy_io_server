@@ -61,8 +61,8 @@ func (user *User) OnLoginReq(req *LobbyPacket.LoginReq) {
 		res.RetCode = ReturnCode.ReturnCode_retOK
 	}
 
-	user.Uid = accountManager.GetUID(name)
-	res.Uid = user.Uid
+	user.UID = accountManager.GetUID(name)
+	res.Uid = user.UID
 
 	user.SendPacket(PROTOCOL.ProtocolID_LoginRes, res)
 }
