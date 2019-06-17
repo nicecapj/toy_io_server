@@ -31,7 +31,7 @@ func (roomManager *RoomManager) Init() {
 	roomManager.roomList = list.New()
 }
 
-// GetLeisuerlyRoom is return a room that is not full
+// GetLeisuerlyRoom return a room that is not full
 func (roomManager *RoomManager) GetLeisuerlyRoom() *Room {
 	roomManager.Lock()
 	for e := roomManager.roomList.Front(); e != nil; e = e.Next() {
@@ -48,6 +48,23 @@ func (roomManager *RoomManager) GetLeisuerlyRoom() *Room {
 	room := roomManager.CreateRoom()
 
 	return room
+}
+
+// FindRoom return a finded room
+func (roomManager *RoomManager) FindRoom(roomID int32) *Room {
+	roomManager.Lock()
+	for e := roomManager.roomList.Front(); e != nil; e = e.Next() {
+
+		room := e.Value.(*Room)
+
+		if room.RoomID == roomID {
+			roomManager.Unlock()
+			return room
+		}
+	}
+	roomManager.Unlock()
+
+	return nil
 }
 
 // CreateRoom ...

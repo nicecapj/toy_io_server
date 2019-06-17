@@ -2,8 +2,10 @@ package main
 
 import (
 	"container/list"
+	"log"
 	LobbyPacket "packet_lobby"
 	PROTOCOL "packet_protocol"
+	ReturnCode "packet_returncode"
 	"sync"
 
 	"github.com/golang/protobuf/proto"
@@ -23,12 +25,28 @@ func (room *Room) Init() {
 }
 
 func (room *Room) Enter(session *User) bool {
-	if room.addUser(session) == false {
+	res := &LobbyPacket.RoomEnterRes{}
+	res.RetCode = ReturnCode.ReturnCode_retOK
+
+	if session.enteredRoom != nil {
+		//already entered.
+		res.RetCode = ReturnCode.ReturnCode_retFail
+		session.SendPacket(PROTOCOL.ProtocolID_RoomEnterRes, res)
 		return false
 	}
 
-	packet := &LobbyPacket.RoomEnterNfy{}
+	if room.addUser(session) == false {
+		//full room. try enter another room
+		res.RetCode = ReturnCode.ReturnCode_retFail
+		session.SendPacket(PROTOCOL.ProtocolID_RoomEnterRes, res)
+		return false
+	}
 
+	res.RoomID = room.RoomID
+	res.RoomName = room.Name
+	session.SendPacket(PROTOCOL.ProtocolID_RoomEnterRes, res)
+
+	nfy := &LobbyPacket.RoomEnterNfy{}
 	for e := room.userList.Back(); e != nil; e = e.Prev() {
 		user := e.Value.(*User)
 
@@ -38,16 +56,43 @@ func (room *Room) Enter(session *User) bool {
 			Location: &LobbyPacket.Location{},
 		}
 
-		packet.UserInfoList = append(packet.UserInfoList, userInfo)
+		nfy.UserInfoList = append(nfy.UserInfoList, userInfo)
 	}
 
-	room.Broadcast(session, PROTOCOL.ProtocolID_RoomEnterNfy, packet)
+	room.Broadcast(session, PROTOCOL.ProtocolID_RoomEnterNfy, nfy)
+
+	log.Printf("[Room] User %s Entered in %s", session.Name, room.Name)
 
 	return true
 }
 
 func (room *Room) Leave(session *User) {
-	room.deleteUser(session)
+	if room.IsExistUser(session) {
+		packet := &LobbyPacket.RoomLeaveRes{}
+		packet.RetCode = ReturnCode.ReturnCode_retOK
+		session.SendPacket(PROTOCOL.ProtocolID_RoomLeaveRes, packet)
+
+		nfy := &LobbyPacket.RoomLeaveNfy{}
+		for e := room.userList.Back(); e != nil; e = e.Prev() {
+			user := e.Value.(*User)
+
+			userInfo := &LobbyPacket.UserInfo{
+				Uid:      user.UID,
+				Name:     user.Name,
+				Location: &LobbyPacket.Location{},
+			}
+
+			nfy.UserInfoList = append(nfy.UserInfoList, userInfo)
+		}
+
+		room.Broadcast(session, PROTOCOL.ProtocolID_RoomLeaveNfy, nfy)
+
+		room.Lock()
+		room.deleteUser(session)
+		room.Unlock()
+
+		log.Printf("[Room] User %s left from %s", session.Name, room.Name)
+	}
 }
 
 func (room *Room) SendUserList(session *User) {
@@ -89,12 +134,15 @@ func (room *Room) deleteUser(session *User) bool {
 }
 
 func (room *Room) IsExistUser(Session *User) bool {
+	room.Lock()
 	for e := room.userList.Back(); e != nil; e = e.Prev() {
 		if e.Value == Session {
+			room.Unlock()
 			return true
 		}
 	}
 
+	room.Unlock()
 	return false
 }
 

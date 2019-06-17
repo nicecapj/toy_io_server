@@ -45,6 +45,7 @@ message ReadyForGameReq {
 
 message RoomLeaveReq {	
 	int64 uid = 1;
+	int32 roomID = 2;
 }
 
 message RoomLeaveRes {	

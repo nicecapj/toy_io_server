@@ -14,11 +14,21 @@ import (
 // User is session + logic packet
 type User struct {
 	*Network.Session
+	enteredRoom *Room
+	isReadyGame bool
 }
 
 // Init used for initialize of session
 func (user *User) Init(session *Network.Session) {
 	user.Session = session
+}
+
+func (user *User) Close() {
+	if user.enteredRoom != nil {
+		user.enteredRoom.Leave(user)
+	}
+
+	user.Session.Close()
 }
 
 // DispatchPacket is dispatch packet.
@@ -42,6 +52,25 @@ func (user *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) 
 			log.Printf("%s\n", req.String())
 
 			user.OnRoomEnterReq(req)
+		}
+	case PROTOCOL.ProtocolID_ReadyForGameReq:
+		{
+			req := &LobbyPacket.ReadyForGameReq{}
+			err := proto.Unmarshal(buffer[:], req)
+			Util.ProcessError(err)
+			log.Printf("%s\n", req.String())
+
+			user.OnReadyForGameReq(req)
+		}
+
+	case PROTOCOL.ProtocolID_RoomLeaveReq:
+		{
+			req := &LobbyPacket.RoomLeaveReq{}
+			err := proto.Unmarshal(buffer[:], req)
+			Util.ProcessError(err)
+			log.Printf("%s\n", req.String())
+
+			user.OnRoomLeaveReq(req)
 		}
 	}
 }
@@ -69,24 +98,44 @@ func (user *User) OnLoginReq(req *LobbyPacket.LoginReq) {
 
 // OnRoomEnterReq ...
 func (user *User) OnRoomEnterReq(req *LobbyPacket.RoomEnterReq) {
-	res := &LobbyPacket.RoomEnterRes{}
-
 	roomManager := GetRoomManager()
 	room := roomManager.GetLeisuerlyRoom()
 	if room != nil {
 		if room.Enter(user) == true {
-			res.RetCode = ReturnCode.ReturnCode_retOK
-			res.RoomID = room.RoomID
-			res.RoomName = room.Name
+			user.SetRoom(room)
 		} else {
-			//fail to enter room
-			res.RetCode = ReturnCode.ReturnCode_retFail
+			//error packet : fail to enter room
+			//res.RetCode = ReturnCode.ReturnCode_retFail
 		}
 
 	} else {
-		//not enought room.
+		//error packet : not enought room.
+		//res.RetCode = ReturnCode.ReturnCode_retFail
+	}
+}
+
+// OnRoomLeaveReq ...
+func (user *User) OnRoomLeaveReq(req *LobbyPacket.RoomLeaveReq) {
+	res := &LobbyPacket.RoomLeaveRes{}
+
+	roomManager := GetRoomManager()
+	room := roomManager.FindRoom(req.RoomID)
+	if room != nil {
+		res.RetCode = ReturnCode.ReturnCode_retOK
+	} else {
+		//can`t not find room.
 		res.RetCode = ReturnCode.ReturnCode_retFail
 	}
 
-	user.SendPacket(PROTOCOL.ProtocolID_RoomEnterRes, res)
+	user.SendPacket(PROTOCOL.ProtocolID_RoomLeaveRes, res)
+}
+
+// OnReadyForGameReq. if do not received from user, ignored from all logic
+func (user *User) OnReadyForGameReq(req *LobbyPacket.ReadyForGameReq) {
+
+	user.isReadyGame = true
+}
+
+func (user *User) SetRoom(room *Room) {
+	user.enteredRoom = room
 }
