@@ -42,6 +42,10 @@ func (session *Session) InitConnection(conn net.Conn) {
 // SendPacket ...
 func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Message) {
 
+	if !session.IsConnected() {
+		return
+	}
+
 	body, err := proto.Marshal(pb)
 	if err != nil {
 		log.Panicln(err)
@@ -145,5 +149,5 @@ func (session *Session) Close() {
 }
 
 func (session *Session) OnTick(delta time.Duration) {
-	log.Printf("Tick : %s", session.Name)
+	//log.Printf("Tick : %s", session.Name)
 }
