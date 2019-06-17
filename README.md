@@ -2,34 +2,34 @@
  Golang io game server to make fun
 
 
-1. Ready for work
+**1. Ready for work**
 install golang 1.12.5
 
-2. install ide(in my case, used vs code and plugin)
+**2. install ide(in my case, used vs code and plugin)
 
-3.download protoc.exe
+**3.download protoc.exe**
 https://repo1.maven.org/maven2/com/google/protobuf/protoc/3.6.1/ 
 
-4.download protobuff package
+**4.download protobuff package**
 go get github.com/golang/protobuf/proto
 
-*5. download protoc go version
-*go get github.com/golang/protobuf/protoc-gen-go
+**5. download protoc go version**
+go get github.com/golang/protobuf/protoc-gen-go
 
-*6. make protobuf go file
-*protoc --go_out=. login.proto
-*protoc --go_out=. returncode.proto
-
-
+**6. make protobuf go file**
+protoc --go_out=. login.proto
+protoc --go_out=. returncode.proto
 
 
 
 
-for go client
+
+
+**for go client
 protoc --go_out=. login.proto
 
 
-for c++ client
+**for c++ client
 protoc --cpp_out=. login.proto
 
 
