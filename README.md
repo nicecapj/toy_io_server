@@ -13,12 +13,12 @@ https://repo1.maven.org/maven2/com/google/protobuf/protoc/3.6.1/
 4.download protobuff package
 go get github.com/golang/protobuf/proto
 
-5. download protoc go version
-go get github.com/golang/protobuf/protoc-gen-go
+*5. download protoc go version
+*go get github.com/golang/protobuf/protoc-gen-go
 
-6. make protobuf go file
-protoc --go_out=. login.proto
-protoc --go_out=. returncode.proto
+*6. make protobuf go file
+*protoc --go_out=. login.proto
+*protoc --go_out=. returncode.proto
 
 
 
