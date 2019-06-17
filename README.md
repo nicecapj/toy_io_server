@@ -19,17 +19,17 @@ go get github.com/golang/protobuf/protoc-gen-go
 **6. make protobuf go file**  
 protoc --go_out=. login.proto  
 protoc --go_out=. returncode.proto
+    
+    
 
 
 
 
-
-
-**for go client
+**for go client**  
 protoc --go_out=. login.proto
 
 
-**for c++ client
+**for c++ client**  
 protoc --cpp_out=. login.proto
 
 
