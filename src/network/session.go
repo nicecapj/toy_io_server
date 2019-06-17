@@ -10,6 +10,7 @@ import (
 	PROTOCOL "packet_protocol"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 )
@@ -141,4 +142,8 @@ func (session *Session) Close() {
 
 	SessionManager := GetSessionManager()
 	SessionManager.RemoveSession(session)
+}
+
+func (session *Session) OnTick(delta time.Duration) {
+	log.Printf("Tick : %s", session.Name)
 }

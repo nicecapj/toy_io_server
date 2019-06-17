@@ -5,6 +5,7 @@ import (
 	"net"
 	PROTOCOL "packet_protocol"
 	"sync"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 )
@@ -14,6 +15,7 @@ type SessionManager struct {
 	sync.Mutex
 	//sessionList map[net.Conn]interface{}
 	sessionList map[net.Conn]*Session
+	tickTimer   *time.Timer
 }
 
 var sessionManagerInstace *SessionManager
@@ -33,6 +35,9 @@ func GetSessionManager() *SessionManager {
 func (sessionManager *SessionManager) Init() {
 
 	sessionManager.sessionList = make(map[net.Conn]*Session)
+
+	//timer
+	sessionManager.SetTimer(500 * time.Millisecond)
 }
 
 // CreateSession make new sessionManager
@@ -104,4 +109,30 @@ func (sessionManager *SessionManager) Broadcast(protocolID PROTOCOL.ProtocolID, 
 			session.SendPacket(protocolID, pb)
 		}
 	}
+}
+
+// OnTick is ...
+func (sessionManager *SessionManager) OnTick(delta time.Duration) {
+
+	sessionManager.Lock()
+	//log.Printf("Update Tick")
+
+	for _, session := range sessionManager.sessionList {
+		if session != nil {
+			session.OnTick(delta)
+		}
+	}
+
+	sessionManager.Unlock()
+}
+
+func (sessionManager *SessionManager) SetTimer(duration time.Duration) {
+	timer := time.NewTimer(duration)
+	func() {
+		<-timer.C
+
+		sessionManager.OnTick(duration)
+		go sessionManager.SetTimer(duration)
+	}()
+
 }
