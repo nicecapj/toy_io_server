@@ -15,8 +15,12 @@ func main() {
 	conn, err := net.Dial("tcp", "127.0.0.1:6666")
 	util.ProcessError(err)
 
-	sessionManager := Network.GetSessionManager() //no need for client, but is used for creation session by server routine.
-	session := sessionManager.CreateSession(conn)
+	//sessionManager := Network.GetSessionManager() //no need for client
+	//session := sessionManager.CreateSession(conn)
+	session := &Network.Session{}
+	if session != nil {
+		session.InitConnection(conn)
+	}
 
 	clientSession := &ClientSession{}
 	clientSession.Init(session)
