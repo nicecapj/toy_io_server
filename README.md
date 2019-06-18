@@ -2,11 +2,10 @@
 - Try to create a real time gameServer using golang, tcp, protobuf, and concurrency programs.
 - First goal: to make a moveable .io game. 
 
+![mainFlow_ver1](https://user-images.githubusercontent.com/8508812/59664539-34767a80-91ec-11e9-9183-657a4e991eaa.jpg)
 
-https://github.com/nicecapj/toy_io_server/blob/master/doc/mainFlow_ver1.jpg
 
-
-**0. Simple run
+**0. Simple run**
 1. Setting GOPATH to toy_io_server root folder (reference : https://github.com/golang/go/wiki/SettingGOPATH  
 2. run server : go run toy_io_server\src\toy_io_server\toy_io_server.go  
 3. run test client : go run toy_io_server\src\toy_io_testClient\toy_io_testClient.go  
