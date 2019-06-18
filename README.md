@@ -1,7 +1,11 @@
 # toy_io_server
 - Try to create a real time gameServer using golang, tcp, protobuf, and concurrency programs.
 - First goal: to make a moveable .io game. 
-
+  
+- It is a room-type server.
+- Room will be assigned automatically upon request.
+- The room is assigned to the same room until the room is full, and the room is assigned to the next room when the room is full.
+  
 ![mainFlow_ver1](https://user-images.githubusercontent.com/8508812/59664539-34767a80-91ec-11e9-9183-657a4e991eaa.jpg)
 
 
