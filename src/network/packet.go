@@ -10,6 +10,11 @@ type Header struct {
 	PacketID   PROTOCOL.ProtocolID
 }
 
+type Packet struct {
+	Header
+	MessageStream []byte
+}
+
 //PacketHeaderLen used for performance(call sizeof(Header))
 const PacketHeaderLen = 8
 

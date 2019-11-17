@@ -22,6 +22,10 @@ type Session struct {
 	isConnected bool
 	PoolBuffer  sync.Pool
 
+	recvChan chan Packet
+	sendChan chan Packet
+	exitChan chan struct{}
+
 	Name string
 	UID  int64
 }
@@ -30,6 +34,10 @@ type Session struct {
 func (session *Session) InitConnection(conn net.Conn) {
 	session.Conn = conn
 	session.isConnected = true
+
+	session.recvChan = make(chan Packet, 2)
+	session.sendChan = make(chan Packet, 2)
+	session.exitChan = make(chan struct{})
 
 	session.PoolBuffer = sync.Pool{
 		New: func() interface{} {
@@ -71,7 +79,14 @@ func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Mess
 
 	buffer.Write(body)
 
-	session.Send(buffer.Bytes())
+	packet := Packet{}
+	packet.Header.PacketID = protocolID
+	//packet.Header.PacketSize = int32(len(buffer))
+	packet.MessageStream = buffer.Bytes()
+
+	session.sendChan <- packet
+
+	//session.Send(buffer.Bytes())
 }
 
 // SetHeader ...
@@ -88,6 +103,11 @@ func (session *Session) SetHeader(header Header) (*bytes.Buffer, error) {
 
 // DispatchPacket ...
 func (session *Session) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+	packet := Packet{}
+	packet.Header.PacketID = protocolID
+	packet.Header.PacketSize = int32(len(buffer))
+	packet.MessageStream = buffer[:]
+	session.recvChan <- packet
 }
 
 // GetHeader ...
@@ -150,4 +170,18 @@ func (session *Session) Close() {
 
 func (session *Session) OnTick(delta time.Duration) {
 	//log.Printf("Tick : %s", session.Name)
+
+	for recvPacket := range session.sendChan {
+		//recvPacket.Header.PacketID
+		log.Printf("channel recv : %d\n", recvPacket.Header.PacketID)
+
+		//!!! You need to run the handler of the user, but you can't call it because it's a session. Is there no way????
+	}
+
+	for sendPacket := range session.recvChan {
+		//fmt.Println(i) // 꺼낸 값을 출력
+
+		log.Printf("channel send : %d\n", sendPacket.Header.PacketID)
+		session.Send(sendPacket.MessageStream)
+	}
 }

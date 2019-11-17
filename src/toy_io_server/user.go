@@ -32,7 +32,8 @@ func (user *User) Close() {
 }
 
 // DispatchPacket is dispatch packet.
-func (user *User) DispatchPacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+func (user *User) HandlePacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+
 	switch protocolID {
 	case PROTOCOL.ProtocolID_LoginReq:
 		{

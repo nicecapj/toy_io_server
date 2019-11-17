@@ -62,7 +62,11 @@ func handleSession(user *User) {
 				panic("packet size larger than maxsize")
 			}
 
-			user.DispatchPacket(header.PacketID, bufferArray[Network.PacketHeaderLen:header.PacketSize])
+			//channel style
+			//user.DispatchPacket(header.PacketID, bufferArray[Network.PacketHeaderLen:header.PacketSize])
+
+			//immediately process style
+			user.HandlePacket(header.PacketID, bufferArray[Network.PacketHeaderLen:header.PacketSize])
 
 			buffer.Next(int(header.PacketSize))
 		}

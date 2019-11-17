@@ -55,3 +55,53 @@ message RoomLeaveRes {
 message RoomLeaveNfy {	
 	repeated UserInfo UserInfoList = 1;
 }
+
+message MoveStartReq{
+	int64 uid = 1;
+	Location targetPos = 2;
+}
+
+message MoveStartRes{
+	returncode.ReturnCode retCode = 1;
+	Location targetPos = 2;
+}
+
+message MoveStartNfy{	
+	Location targetPos = 2;
+}
+
+message MoveChangeReq{	
+	int64 uid = 1;
+	Location targetPos = 2;
+}
+
+message MoveChangeRes{
+	returncode.ReturnCode retCode = 1;
+	Location targetPos = 2;
+}
+
+message MoveChangeNfy{	
+	int64 uid = 1;
+	Location targetPos = 2;
+}
+
+message MoveEndReq{
+	int64 uid = 1;
+	Location startPos= 2;
+	Location endPos = 3;
+}
+
+message MoveEndRes{
+	returncode.ReturnCode retCode = 1;
+	Location endPos = 2;
+}
+
+message MoveEndNfy{
+	Location startPos= 1;
+	Location endPos = 2;
+}
+
+message AttackTo{
+	int64 targetUid = 1;
+	int32 skillID = 2;	
+}
