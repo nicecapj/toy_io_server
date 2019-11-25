@@ -84,9 +84,11 @@ func (session *Session) SendPacket(protocolID PROTOCOL.ProtocolID, pb proto.Mess
 	//packet.Header.PacketSize = int32(len(buffer))
 	packet.MessageStream = buffer.Bytes()
 
-	session.sendChan <- packet
+	//channel style
+	//session.sendChan <- packet
 
-	//session.Send(buffer.Bytes())
+	//immediately process style
+	session.Send(buffer.Bytes())
 }
 
 // SetHeader ...
@@ -171,17 +173,13 @@ func (session *Session) Close() {
 func (session *Session) OnTick(delta time.Duration) {
 	//log.Printf("Tick : %s", session.Name)
 
-	for recvPacket := range session.sendChan {
-		//recvPacket.Header.PacketID
-		log.Printf("channel recv : %d\n", recvPacket.Header.PacketID)
-
-		//!!! You need to run the handler of the user, but you can't call it because it's a session. Is there no way????
-	}
-
-	for sendPacket := range session.recvChan {
-		//fmt.Println(i) // 꺼낸 값을 출력
-
+	//channel style
+	for sendPacket := range session.sendChan {
 		log.Printf("channel send : %d\n", sendPacket.Header.PacketID)
 		session.Send(sendPacket.MessageStream)
+	}
+
+	for recvPacket := range session.recvChan {
+		log.Printf("channel recv : %d\n", recvPacket.Header.PacketID)
 	}
 }
