@@ -25,4 +25,4 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v toy_io_server/.
+      run: go build -v ./toy_io_server/src/toy_io_server/
