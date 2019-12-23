@@ -173,13 +173,15 @@ func (session *Session) Close() {
 func (session *Session) OnTick(delta time.Duration) {
 	//log.Printf("Tick : %s", session.Name)
 
-	//channel style
-	for sendPacket := range session.sendChan {
-		log.Printf("channel send : %d\n", sendPacket.Header.PacketID)
-		session.Send(sendPacket.MessageStream)
-	}
+	//sync lock! it make stop sessionManager`s ontick
 
-	for recvPacket := range session.recvChan {
-		log.Printf("channel recv : %d\n", recvPacket.Header.PacketID)
-	}
+	// //channel style
+	// for sendPacket := range session.`sendChan` {
+	// 	log.Printf("channel send : %d\n", sendPacket.Header.PacketID)
+	// 	session.Send(sendPacket.MessageStream)
+	// }
+
+	// for recvPacket := range session.recvChan {
+	// 	log.Printf("channel recv : %d\n", recvPacket.Header.PacketID)
+	// }
 }

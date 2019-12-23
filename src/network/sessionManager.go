@@ -61,19 +61,22 @@ func (sessionManager *SessionManager) CreateSession(Conn net.Conn) *Session {
 func (sessionManager *SessionManager) AddSession(session *Session) bool {
 
 	sessionManager.Lock()
+	log.Printf("Lock : AddSession")
+
 	_, ok := sessionManager.sessionList[session.Conn]
 	if ok == false {
 		sessionManager.sessionList[session.Conn] = session
 
 		userCount := len(sessionManager.sessionList)
 		log.Printf("UserCount : %d", userCount)
-
 		sessionManager.Unlock()
+		log.Printf("UnLock : AddSession")
 		return true
 	}
 
 	sessionManager.sessionList[session.Conn] = session
 	sessionManager.Unlock()
+	log.Printf("UnLock : AddSession")
 	return true
 }
 
@@ -86,8 +89,10 @@ func (sessionManager *SessionManager) RemoveSession(session *Session) bool {
 	log.Printf("user: %s removed from sessionManager\n", session.Name)
 
 	sessionManager.Lock()
+	log.Printf("Lock : RemoveSession")
 	delete(sessionManager.sessionList, session.Conn)
 	sessionManager.Unlock()
+	log.Printf("UnLock : AddSesRemoveSessionsion")
 
 	return true
 }
@@ -96,8 +101,10 @@ func (sessionManager *SessionManager) RemoveSession(session *Session) bool {
 func (sessionManager *SessionManager) FindSession(session net.Conn) bool {
 
 	sessionManager.Lock()
+	log.Printf("Lock : FindSession")
 	_, ok := sessionManager.sessionList[session]
 	sessionManager.Unlock()
+	log.Printf("Unlock : FindSession")
 
 	return ok
 }
@@ -115,7 +122,7 @@ func (sessionManager *SessionManager) Broadcast(protocolID PROTOCOL.ProtocolID, 
 func (sessionManager *SessionManager) OnTick(delta time.Duration) {
 
 	sessionManager.Lock()
-	//log.Printf("Update Tick")
+	log.Printf("Lock : Update Tick")
 
 	for _, session := range sessionManager.sessionList {
 		if session != nil {
@@ -124,6 +131,7 @@ func (sessionManager *SessionManager) OnTick(delta time.Duration) {
 	}
 
 	sessionManager.Unlock()
+	log.Printf("UnLock : Update Tick")
 }
 
 func (sessionManager *SessionManager) SetTimer(duration time.Duration) {
