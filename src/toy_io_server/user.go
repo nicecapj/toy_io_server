@@ -16,11 +16,15 @@ type User struct {
 	*Network.Session
 	enteredRoom *Room
 	isReadyGame bool
+	posX        int
+	posy        int
 }
 
 // Init used for initialize of session
 func (user *User) Init(session *Network.Session) {
 	user.Session = session
+	user.posX = 0
+	user.posy = 0
 }
 
 func (user *User) Close() {
@@ -30,6 +34,7 @@ func (user *User) Close() {
 
 	user.Session.Close()
 }
+
 
 // DispatchPacket is dispatch packet.
 func (user *User) HandlePacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {

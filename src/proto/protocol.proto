@@ -13,4 +13,14 @@ enum ProtocolID {
 	RoomLeaveReq = 7;
 	RoomLeaveRes = 8;
 	RoomLeaveNfy = 9;
+	
+	MoveStartReq = 10;
+	MoveStartRes = 11;
+	MoveStartNfy = 12;
+	MoveChangeReq = 13;
+	MoveChangeRes = 14;
+	MoveChangeNfy = 15;
+	MoveEndReq = 16;
+	MoveEndRes = 17;
+	MoveEndNfy = 18;
 }

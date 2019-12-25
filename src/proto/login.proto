@@ -58,7 +58,8 @@ message RoomLeaveNfy {
 
 message MoveStartReq{
 	int64 uid = 1;
-	Location targetPos = 2;
+	Location currentPos = 2;
+	Location targetPos = 3;
 }
 
 message MoveStartRes{
@@ -67,12 +68,14 @@ message MoveStartRes{
 }
 
 message MoveStartNfy{	
+	Location currentPos = 1;
 	Location targetPos = 2;
 }
 
 message MoveChangeReq{	
 	int64 uid = 1;
-	Location targetPos = 2;
+	Location currentPos = 2;
+	Location targetPos = 3;
 }
 
 message MoveChangeRes{
@@ -87,8 +90,7 @@ message MoveChangeNfy{
 
 message MoveEndReq{
 	int64 uid = 1;
-	Location startPos= 2;
-	Location endPos = 3;
+	Location targetPos = 2;
 }
 
 message MoveEndRes{

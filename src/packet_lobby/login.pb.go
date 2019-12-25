@@ -523,6 +523,492 @@ func (m *RoomLeaveNfy) GetUserInfoList() []*UserInfo {
 	return nil
 }
 
+type MoveStartReq struct {
+	Uid                  int64     `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	CurrentPos           *Location `protobuf:"bytes,2,opt,name=currentPos,proto3" json:"currentPos,omitempty"`
+	TargetPos            *Location `protobuf:"bytes,3,opt,name=targetPos,proto3" json:"targetPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *MoveStartReq) Reset()         { *m = MoveStartReq{} }
+func (m *MoveStartReq) String() string { return proto.CompactTextString(m) }
+func (*MoveStartReq) ProtoMessage()    {}
+func (*MoveStartReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{11}
+}
+
+func (m *MoveStartReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveStartReq.Unmarshal(m, b)
+}
+func (m *MoveStartReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveStartReq.Marshal(b, m, deterministic)
+}
+func (m *MoveStartReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveStartReq.Merge(m, src)
+}
+func (m *MoveStartReq) XXX_Size() int {
+	return xxx_messageInfo_MoveStartReq.Size(m)
+}
+func (m *MoveStartReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveStartReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveStartReq proto.InternalMessageInfo
+
+func (m *MoveStartReq) GetUid() int64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *MoveStartReq) GetCurrentPos() *Location {
+	if m != nil {
+		return m.CurrentPos
+	}
+	return nil
+}
+
+func (m *MoveStartReq) GetTargetPos() *Location {
+	if m != nil {
+		return m.TargetPos
+	}
+	return nil
+}
+
+type MoveStartRes struct {
+	RetCode              ReturnCode `protobuf:"varint,1,opt,name=retCode,proto3,enum=packet.returncode.ReturnCode" json:"retCode,omitempty"`
+	TargetPos            *Location  `protobuf:"bytes,2,opt,name=targetPos,proto3" json:"targetPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *MoveStartRes) Reset()         { *m = MoveStartRes{} }
+func (m *MoveStartRes) String() string { return proto.CompactTextString(m) }
+func (*MoveStartRes) ProtoMessage()    {}
+func (*MoveStartRes) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{12}
+}
+
+func (m *MoveStartRes) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveStartRes.Unmarshal(m, b)
+}
+func (m *MoveStartRes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveStartRes.Marshal(b, m, deterministic)
+}
+func (m *MoveStartRes) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveStartRes.Merge(m, src)
+}
+func (m *MoveStartRes) XXX_Size() int {
+	return xxx_messageInfo_MoveStartRes.Size(m)
+}
+func (m *MoveStartRes) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveStartRes.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveStartRes proto.InternalMessageInfo
+
+func (m *MoveStartRes) GetRetCode() ReturnCode {
+	if m != nil {
+		return m.RetCode
+	}
+	return ReturnCode_retOK
+}
+
+func (m *MoveStartRes) GetTargetPos() *Location {
+	if m != nil {
+		return m.TargetPos
+	}
+	return nil
+}
+
+type MoveStartNfy struct {
+	CurrentPos           *Location `protobuf:"bytes,1,opt,name=currentPos,proto3" json:"currentPos,omitempty"`
+	TargetPos            *Location `protobuf:"bytes,2,opt,name=targetPos,proto3" json:"targetPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *MoveStartNfy) Reset()         { *m = MoveStartNfy{} }
+func (m *MoveStartNfy) String() string { return proto.CompactTextString(m) }
+func (*MoveStartNfy) ProtoMessage()    {}
+func (*MoveStartNfy) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{13}
+}
+
+func (m *MoveStartNfy) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveStartNfy.Unmarshal(m, b)
+}
+func (m *MoveStartNfy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveStartNfy.Marshal(b, m, deterministic)
+}
+func (m *MoveStartNfy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveStartNfy.Merge(m, src)
+}
+func (m *MoveStartNfy) XXX_Size() int {
+	return xxx_messageInfo_MoveStartNfy.Size(m)
+}
+func (m *MoveStartNfy) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveStartNfy.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveStartNfy proto.InternalMessageInfo
+
+func (m *MoveStartNfy) GetCurrentPos() *Location {
+	if m != nil {
+		return m.CurrentPos
+	}
+	return nil
+}
+
+func (m *MoveStartNfy) GetTargetPos() *Location {
+	if m != nil {
+		return m.TargetPos
+	}
+	return nil
+}
+
+type MoveChangeReq struct {
+	Uid                  int64     `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	CurrentPos           *Location `protobuf:"bytes,2,opt,name=currentPos,proto3" json:"currentPos,omitempty"`
+	TargetPos            *Location `protobuf:"bytes,3,opt,name=targetPos,proto3" json:"targetPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *MoveChangeReq) Reset()         { *m = MoveChangeReq{} }
+func (m *MoveChangeReq) String() string { return proto.CompactTextString(m) }
+func (*MoveChangeReq) ProtoMessage()    {}
+func (*MoveChangeReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{14}
+}
+
+func (m *MoveChangeReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveChangeReq.Unmarshal(m, b)
+}
+func (m *MoveChangeReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveChangeReq.Marshal(b, m, deterministic)
+}
+func (m *MoveChangeReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveChangeReq.Merge(m, src)
+}
+func (m *MoveChangeReq) XXX_Size() int {
+	return xxx_messageInfo_MoveChangeReq.Size(m)
+}
+func (m *MoveChangeReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveChangeReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveChangeReq proto.InternalMessageInfo
+
+func (m *MoveChangeReq) GetUid() int64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *MoveChangeReq) GetCurrentPos() *Location {
+	if m != nil {
+		return m.CurrentPos
+	}
+	return nil
+}
+
+func (m *MoveChangeReq) GetTargetPos() *Location {
+	if m != nil {
+		return m.TargetPos
+	}
+	return nil
+}
+
+type MoveChangeRes struct {
+	RetCode              ReturnCode `protobuf:"varint,1,opt,name=retCode,proto3,enum=packet.returncode.ReturnCode" json:"retCode,omitempty"`
+	TargetPos            *Location  `protobuf:"bytes,2,opt,name=targetPos,proto3" json:"targetPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *MoveChangeRes) Reset()         { *m = MoveChangeRes{} }
+func (m *MoveChangeRes) String() string { return proto.CompactTextString(m) }
+func (*MoveChangeRes) ProtoMessage()    {}
+func (*MoveChangeRes) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{15}
+}
+
+func (m *MoveChangeRes) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveChangeRes.Unmarshal(m, b)
+}
+func (m *MoveChangeRes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveChangeRes.Marshal(b, m, deterministic)
+}
+func (m *MoveChangeRes) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveChangeRes.Merge(m, src)
+}
+func (m *MoveChangeRes) XXX_Size() int {
+	return xxx_messageInfo_MoveChangeRes.Size(m)
+}
+func (m *MoveChangeRes) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveChangeRes.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveChangeRes proto.InternalMessageInfo
+
+func (m *MoveChangeRes) GetRetCode() ReturnCode {
+	if m != nil {
+		return m.RetCode
+	}
+	return ReturnCode_retOK
+}
+
+func (m *MoveChangeRes) GetTargetPos() *Location {
+	if m != nil {
+		return m.TargetPos
+	}
+	return nil
+}
+
+type MoveChangeNfy struct {
+	Uid                  int64     `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	TargetPos            *Location `protobuf:"bytes,2,opt,name=targetPos,proto3" json:"targetPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *MoveChangeNfy) Reset()         { *m = MoveChangeNfy{} }
+func (m *MoveChangeNfy) String() string { return proto.CompactTextString(m) }
+func (*MoveChangeNfy) ProtoMessage()    {}
+func (*MoveChangeNfy) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{16}
+}
+
+func (m *MoveChangeNfy) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveChangeNfy.Unmarshal(m, b)
+}
+func (m *MoveChangeNfy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveChangeNfy.Marshal(b, m, deterministic)
+}
+func (m *MoveChangeNfy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveChangeNfy.Merge(m, src)
+}
+func (m *MoveChangeNfy) XXX_Size() int {
+	return xxx_messageInfo_MoveChangeNfy.Size(m)
+}
+func (m *MoveChangeNfy) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveChangeNfy.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveChangeNfy proto.InternalMessageInfo
+
+func (m *MoveChangeNfy) GetUid() int64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *MoveChangeNfy) GetTargetPos() *Location {
+	if m != nil {
+		return m.TargetPos
+	}
+	return nil
+}
+
+type MoveEndReq struct {
+	Uid                  int64     `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	TargetPos            *Location `protobuf:"bytes,2,opt,name=targetPos,proto3" json:"targetPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *MoveEndReq) Reset()         { *m = MoveEndReq{} }
+func (m *MoveEndReq) String() string { return proto.CompactTextString(m) }
+func (*MoveEndReq) ProtoMessage()    {}
+func (*MoveEndReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{17}
+}
+
+func (m *MoveEndReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveEndReq.Unmarshal(m, b)
+}
+func (m *MoveEndReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveEndReq.Marshal(b, m, deterministic)
+}
+func (m *MoveEndReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveEndReq.Merge(m, src)
+}
+func (m *MoveEndReq) XXX_Size() int {
+	return xxx_messageInfo_MoveEndReq.Size(m)
+}
+func (m *MoveEndReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveEndReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveEndReq proto.InternalMessageInfo
+
+func (m *MoveEndReq) GetUid() int64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *MoveEndReq) GetTargetPos() *Location {
+	if m != nil {
+		return m.TargetPos
+	}
+	return nil
+}
+
+type MoveEndRes struct {
+	RetCode              ReturnCode `protobuf:"varint,1,opt,name=retCode,proto3,enum=packet.returncode.ReturnCode" json:"retCode,omitempty"`
+	EndPos               *Location  `protobuf:"bytes,2,opt,name=endPos,proto3" json:"endPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *MoveEndRes) Reset()         { *m = MoveEndRes{} }
+func (m *MoveEndRes) String() string { return proto.CompactTextString(m) }
+func (*MoveEndRes) ProtoMessage()    {}
+func (*MoveEndRes) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{18}
+}
+
+func (m *MoveEndRes) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveEndRes.Unmarshal(m, b)
+}
+func (m *MoveEndRes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveEndRes.Marshal(b, m, deterministic)
+}
+func (m *MoveEndRes) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveEndRes.Merge(m, src)
+}
+func (m *MoveEndRes) XXX_Size() int {
+	return xxx_messageInfo_MoveEndRes.Size(m)
+}
+func (m *MoveEndRes) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveEndRes.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveEndRes proto.InternalMessageInfo
+
+func (m *MoveEndRes) GetRetCode() ReturnCode {
+	if m != nil {
+		return m.RetCode
+	}
+	return ReturnCode_retOK
+}
+
+func (m *MoveEndRes) GetEndPos() *Location {
+	if m != nil {
+		return m.EndPos
+	}
+	return nil
+}
+
+type MoveEndNfy struct {
+	StartPos             *Location `protobuf:"bytes,1,opt,name=startPos,proto3" json:"startPos,omitempty"`
+	EndPos               *Location `protobuf:"bytes,2,opt,name=endPos,proto3" json:"endPos,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *MoveEndNfy) Reset()         { *m = MoveEndNfy{} }
+func (m *MoveEndNfy) String() string { return proto.CompactTextString(m) }
+func (*MoveEndNfy) ProtoMessage()    {}
+func (*MoveEndNfy) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{19}
+}
+
+func (m *MoveEndNfy) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MoveEndNfy.Unmarshal(m, b)
+}
+func (m *MoveEndNfy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MoveEndNfy.Marshal(b, m, deterministic)
+}
+func (m *MoveEndNfy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MoveEndNfy.Merge(m, src)
+}
+func (m *MoveEndNfy) XXX_Size() int {
+	return xxx_messageInfo_MoveEndNfy.Size(m)
+}
+func (m *MoveEndNfy) XXX_DiscardUnknown() {
+	xxx_messageInfo_MoveEndNfy.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MoveEndNfy proto.InternalMessageInfo
+
+func (m *MoveEndNfy) GetStartPos() *Location {
+	if m != nil {
+		return m.StartPos
+	}
+	return nil
+}
+
+func (m *MoveEndNfy) GetEndPos() *Location {
+	if m != nil {
+		return m.EndPos
+	}
+	return nil
+}
+
+type AttackTo struct {
+	TargetUid            int64    `protobuf:"varint,1,opt,name=targetUid,proto3" json:"targetUid,omitempty"`
+	SkillID              int32    `protobuf:"varint,2,opt,name=skillID,proto3" json:"skillID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AttackTo) Reset()         { *m = AttackTo{} }
+func (m *AttackTo) String() string { return proto.CompactTextString(m) }
+func (*AttackTo) ProtoMessage()    {}
+func (*AttackTo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_67c21677aa7f4e4f, []int{20}
+}
+
+func (m *AttackTo) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AttackTo.Unmarshal(m, b)
+}
+func (m *AttackTo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AttackTo.Marshal(b, m, deterministic)
+}
+func (m *AttackTo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AttackTo.Merge(m, src)
+}
+func (m *AttackTo) XXX_Size() int {
+	return xxx_messageInfo_AttackTo.Size(m)
+}
+func (m *AttackTo) XXX_DiscardUnknown() {
+	xxx_messageInfo_AttackTo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AttackTo proto.InternalMessageInfo
+
+func (m *AttackTo) GetTargetUid() int64 {
+	if m != nil {
+		return m.TargetUid
+	}
+	return 0
+}
+
+func (m *AttackTo) GetSkillID() int32 {
+	if m != nil {
+		return m.SkillID
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterType((*LoginReq)(nil), "packet.lobby.LoginReq")
 	proto.RegisterType((*LoginRes)(nil), "packet.lobby.LoginRes")
@@ -535,32 +1021,53 @@ func init() {
 	proto.RegisterType((*RoomLeaveReq)(nil), "packet.lobby.RoomLeaveReq")
 	proto.RegisterType((*RoomLeaveRes)(nil), "packet.lobby.RoomLeaveRes")
 	proto.RegisterType((*RoomLeaveNfy)(nil), "packet.lobby.RoomLeaveNfy")
+	proto.RegisterType((*MoveStartReq)(nil), "packet.lobby.MoveStartReq")
+	proto.RegisterType((*MoveStartRes)(nil), "packet.lobby.MoveStartRes")
+	proto.RegisterType((*MoveStartNfy)(nil), "packet.lobby.MoveStartNfy")
+	proto.RegisterType((*MoveChangeReq)(nil), "packet.lobby.MoveChangeReq")
+	proto.RegisterType((*MoveChangeRes)(nil), "packet.lobby.MoveChangeRes")
+	proto.RegisterType((*MoveChangeNfy)(nil), "packet.lobby.MoveChangeNfy")
+	proto.RegisterType((*MoveEndReq)(nil), "packet.lobby.MoveEndReq")
+	proto.RegisterType((*MoveEndRes)(nil), "packet.lobby.MoveEndRes")
+	proto.RegisterType((*MoveEndNfy)(nil), "packet.lobby.MoveEndNfy")
+	proto.RegisterType((*AttackTo)(nil), "packet.lobby.AttackTo")
 }
 
 func init() { proto.RegisterFile("login.proto", fileDescriptor_67c21677aa7f4e4f) }
 
 var fileDescriptor_67c21677aa7f4e4f = []byte{
-	// 338 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x93, 0xcf, 0x6b, 0xfa, 0x40,
-	0x10, 0xc5, 0x59, 0xf3, 0xd5, 0x6f, 0x3a, 0x86, 0x56, 0xf6, 0x20, 0x22, 0xb4, 0x84, 0xed, 0xc5,
-	0x53, 0x0e, 0xb6, 0xd0, 0xd2, 0x6b, 0x7f, 0x88, 0x45, 0x3c, 0x0c, 0xf4, 0x0f, 0x88, 0x66, 0x2d,
-	0xa1, 0x26, 0x63, 0xd7, 0xb5, 0x18, 0xfb, 0xcf, 0x97, 0x5d, 0x93, 0x18, 0xd1, 0x5e, 0xea, 0x6d,
-	0x86, 0x7d, 0xf3, 0x3e, 0x79, 0x0f, 0x02, 0xcd, 0x39, 0xbd, 0xc7, 0x69, 0xb0, 0x50, 0xa4, 0x89,
-	0x7b, 0x8b, 0x70, 0xfa, 0x21, 0x75, 0x30, 0xa7, 0xc9, 0x24, 0xeb, 0xb6, 0x94, 0xd4, 0x2b, 0x95,
-	0x4e, 0x29, 0x92, 0xdb, 0x77, 0x71, 0x05, 0xee, 0xc8, 0xc8, 0x51, 0x7e, 0x72, 0x0e, 0xff, 0xd2,
-	0x30, 0x91, 0x1d, 0xe6, 0xb3, 0xde, 0x19, 0xda, 0x59, 0xc4, 0xe5, 0xfb, 0x92, 0xdf, 0xc1, 0x7f,
-	0x25, 0xf5, 0x23, 0x45, 0x5b, 0xc9, 0x79, 0xff, 0x32, 0xc8, 0xdd, 0x2b, 0xb6, 0x68, 0x47, 0x23,
-	0xc2, 0x42, 0xcd, 0x5b, 0xe0, 0xac, 0xe2, 0xa8, 0x53, 0xf3, 0x59, 0xcf, 0x41, 0x33, 0x96, 0x28,
-	0xa7, 0x82, 0xba, 0x35, 0xa8, 0x69, 0xa8, 0x63, 0x4a, 0xb9, 0x07, 0x6c, 0x6d, 0x21, 0x75, 0x64,
-	0x6b, 0xb3, 0x65, 0xf6, 0xba, 0x8e, 0x2c, 0x33, 0xdb, 0xc6, 0x1e, 0xd6, 0x91, 0x6d, 0x44, 0x04,
-	0xee, 0xdb, 0x52, 0xaa, 0x61, 0x3a, 0xa3, 0x82, 0xc3, 0x0e, 0x39, 0xb5, 0x1d, 0x87, 0xf7, 0xc1,
-	0x9d, 0xe7, 0x1c, 0x6b, 0xd3, 0xec, 0xb7, 0x83, 0x6a, 0x4b, 0x41, 0xf1, 0x15, 0x58, 0xea, 0x84,
-	0x0f, 0x1e, 0x12, 0x25, 0xcf, 0xa9, 0x96, 0xca, 0x54, 0x75, 0x40, 0x12, 0xdf, 0x7b, 0x8a, 0x13,
-	0xca, 0x6a, 0x43, 0x43, 0x11, 0x25, 0xc3, 0xa7, 0x3c, 0x71, 0xbe, 0xf1, 0x2e, 0xb8, 0x66, 0x1a,
-	0xef, 0x6a, 0x2b, 0x77, 0xf1, 0x5a, 0x81, 0x8f, 0x67, 0x19, 0x7f, 0x00, 0xaf, 0x28, 0x65, 0x14,
-	0x2f, 0x75, 0x87, 0xf9, 0xce, 0x61, 0xcc, 0x42, 0x81, 0x7b, 0x5a, 0x71, 0x0d, 0x17, 0x28, 0xc3,
-	0x28, 0x7b, 0x21, 0x35, 0x08, 0x13, 0x79, 0x3c, 0xed, 0xfd, 0x16, 0x38, 0x92, 0xe1, 0xd7, 0x71,
-	0xc5, 0x6f, 0x31, 0xc4, 0x60, 0xef, 0xf2, 0xef, 0x3d, 0x15, 0x99, 0xad, 0xd1, 0x89, 0x99, 0x27,
-	0x0d, 0xfb, 0x33, 0xdc, 0xfc, 0x04, 0x00, 0x00, 0xff, 0xff, 0x79, 0x95, 0xb1, 0x9d, 0x3b, 0x03,
-	0x00, 0x00,
+	// 515 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x95, 0x5f, 0x6f, 0xd3, 0x30,
+	0x14, 0xc5, 0xe5, 0x96, 0x76, 0xd9, 0x5d, 0x80, 0xc9, 0x0f, 0x53, 0x35, 0x01, 0xaa, 0xcc, 0xcb,
+	0x9e, 0xf2, 0x50, 0x26, 0x40, 0xbc, 0xc1, 0x18, 0xd3, 0x50, 0x99, 0x90, 0xd9, 0xc4, 0xb3, 0x9b,
+	0x78, 0x25, 0x6a, 0xea, 0x5b, 0x1c, 0x77, 0x5a, 0xc6, 0x9f, 0x8f, 0x00, 0x5f, 0x19, 0xd9, 0x4d,
+	0xd2, 0x44, 0xed, 0xd8, 0x68, 0x25, 0xb4, 0x37, 0xdf, 0xfa, 0xf8, 0xfe, 0x7c, 0x8e, 0xaf, 0x1a,
+	0xd8, 0x4a, 0x70, 0x18, 0xab, 0x60, 0xa2, 0xd1, 0x20, 0xf5, 0x27, 0x22, 0x1c, 0x49, 0x13, 0x24,
+	0x38, 0x18, 0x64, 0xbb, 0xdb, 0x5a, 0x9a, 0xa9, 0x56, 0x21, 0x46, 0x72, 0xb6, 0xcf, 0x9e, 0x80,
+	0xd7, 0xb7, 0x72, 0x2e, 0xbf, 0x52, 0x0a, 0xf7, 0x94, 0x18, 0xcb, 0x0e, 0xe9, 0x92, 0xbd, 0x4d,
+	0xee, 0xd6, 0x2c, 0x2e, 0xf7, 0x53, 0xfa, 0x02, 0x36, 0xb4, 0x34, 0x07, 0x18, 0xcd, 0x24, 0x0f,
+	0x7a, 0x8f, 0x83, 0xbc, 0x7b, 0xa5, 0x2d, 0x77, 0x4b, 0x2b, 0xe2, 0x85, 0x9a, 0x6e, 0x43, 0x73,
+	0x1a, 0x47, 0x9d, 0x46, 0x97, 0xec, 0x35, 0xb9, 0x5d, 0x96, 0xa8, 0x66, 0x05, 0xb5, 0x6f, 0x51,
+	0xa1, 0x30, 0x31, 0x2a, 0xea, 0x03, 0xb9, 0x74, 0x90, 0x16, 0x27, 0x97, 0xb6, 0xca, 0xdc, 0xe9,
+	0x16, 0x27, 0x99, 0xad, 0xae, 0xdc, 0xc1, 0x16, 0x27, 0x57, 0x2c, 0x02, 0xef, 0x2c, 0x95, 0xfa,
+	0x58, 0x9d, 0x63, 0xc1, 0x21, 0x8b, 0x9c, 0xc6, 0x9c, 0x43, 0x7b, 0xe0, 0x25, 0x39, 0xc7, 0xb5,
+	0xd9, 0xea, 0xed, 0x04, 0xd5, 0x94, 0x82, 0xe2, 0x16, 0xbc, 0xd4, 0xb1, 0x2e, 0xf8, 0x1c, 0x71,
+	0x7c, 0xa8, 0x8c, 0xd4, 0x36, 0xaa, 0x05, 0x12, 0xfb, 0x56, 0x53, 0xac, 0x11, 0xd6, 0x0e, 0xb4,
+	0x35, 0xe2, 0xf8, 0xf8, 0x6d, 0xee, 0x38, 0xaf, 0xe8, 0x2e, 0x78, 0x76, 0x75, 0x32, 0x8f, 0xad,
+	0xac, 0xd9, 0xfb, 0x0a, 0xfc, 0xe4, 0x3c, 0xa3, 0xaf, 0xc0, 0x2f, 0x42, 0xe9, 0xc7, 0xa9, 0xe9,
+	0x90, 0x6e, 0x73, 0xd1, 0x66, 0xa1, 0xe0, 0x35, 0x2d, 0x7b, 0x0a, 0x0f, 0xb9, 0x14, 0x51, 0xf6,
+	0x0e, 0xf5, 0x91, 0x18, 0xcb, 0xe5, 0x6e, 0x5f, 0xce, 0x80, 0x7d, 0x29, 0x2e, 0x96, 0x2b, 0xae,
+	0xb3, 0xc1, 0x8e, 0x6a, 0x27, 0x57, 0xcf, 0xa9, 0xf0, 0xec, 0x1a, 0xad, 0xeb, 0xf9, 0x17, 0x01,
+	0xff, 0x03, 0x5e, 0xc8, 0x4f, 0x46, 0x68, 0xb3, 0xdc, 0xcf, 0x73, 0x80, 0x70, 0xaa, 0xb5, 0x54,
+	0xe6, 0x23, 0xa6, 0xce, 0xd3, 0xf5, 0x73, 0x53, 0x51, 0xd2, 0x7d, 0xd8, 0x34, 0x42, 0x0f, 0xa5,
+	0x3b, 0xf6, 0xf7, 0x71, 0x9b, 0x0b, 0xd9, 0x8f, 0xda, 0x7d, 0xd6, 0x98, 0xa6, 0x1a, 0xbe, 0x71,
+	0x5b, 0xfc, 0xf7, 0x0a, 0xde, 0x66, 0x5b, 0x37, 0x4f, 0x56, 0x33, 0x7f, 0x6b, 0xfa, 0x6f, 0x02,
+	0xf7, 0x2d, 0xfe, 0xe0, 0x8b, 0x50, 0x43, 0x79, 0x17, 0x9e, 0xe3, 0x67, 0xfd, 0x42, 0xff, 0xfd,
+	0x3d, 0x3e, 0x57, 0xf9, 0xf6, 0x41, 0x16, 0x03, 0x59, 0xad, 0xf1, 0x29, 0x80, 0x6d, 0x7c, 0xa8,
+	0xa2, 0xe5, 0x31, 0xaf, 0xd6, 0x75, 0x5a, 0xe9, 0xba, 0x46, 0x56, 0x01, 0xb4, 0xa5, 0x8a, 0x6e,
+	0x26, 0xe7, 0x2a, 0x36, 0x29, 0xb1, 0x36, 0xa2, 0x1e, 0x78, 0xa9, 0x9d, 0xdf, 0x9b, 0x27, 0xb6,
+	0xd4, 0xfd, 0x33, 0xf1, 0x0d, 0x78, 0xaf, 0x8d, 0x11, 0xe1, 0xe8, 0x14, 0xe9, 0xa3, 0x22, 0xaa,
+	0xb3, 0x32, 0xc2, 0xf9, 0x0f, 0xb4, 0x03, 0x1b, 0xe9, 0x28, 0x4e, 0x92, 0xf2, 0xff, 0xb0, 0x28,
+	0x07, 0x6d, 0xf7, 0x21, 0x7e, 0xf6, 0x27, 0x00, 0x00, 0xff, 0xff, 0xe8, 0xf2, 0xd0, 0x65, 0xb7,
+	0x07, 0x00, 0x00,
 }
