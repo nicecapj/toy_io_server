@@ -189,6 +189,14 @@ func (user *User) OnMoveStartReq(req *LobbyPacket.MoveStartReq) {
 	res := &LobbyPacket.MoveStartRes{}
 	res.RetCode = ReturnCode.ReturnCode_retOK
 	user.SendPacket(PROTOCOL.ProtocolID_MoveStartRes, res)
+
+	nfy := &LobbyPacket.MoveStartNfy{}
+	nfy.TargetPos = &user.targetLocation
+	//nfy.TargetPos.X = user.targetLocation.X
+	//nfy.TargetPos.Y = user.targetLocation.Y
+	//nfy.TargetPos.Z = user.targetLocation.Z
+
+	user.enteredRoom.Broadcast(user, PROTOCOL.ProtocolID_MoveStartNfy, nfy)
 }
 
 func (user *User) OnMoveChangeReq(req *LobbyPacket.MoveChangeReq) {
@@ -198,6 +206,10 @@ func (user *User) OnMoveChangeReq(req *LobbyPacket.MoveChangeReq) {
 	res := &LobbyPacket.MoveChangeReq{}
 	//res.RetCode = ReturnCode.ReturnCode_retOK
 	user.SendPacket(PROTOCOL.ProtocolID_MoveChangeRes, res)
+
+	nfy := &LobbyPacket.MoveChangeNfy{}
+	nfy.TargetPos = &user.targetLocation
+	user.enteredRoom.Broadcast(user, PROTOCOL.ProtocolID_MoveChangeNfy, nfy)
 }
 
 func (user *User) OnMoveEndReq(req *LobbyPacket.MoveEndReq) {
@@ -207,6 +219,11 @@ func (user *User) OnMoveEndReq(req *LobbyPacket.MoveEndReq) {
 	res := &LobbyPacket.MoveEndRes{}
 	res.RetCode = ReturnCode.ReturnCode_retOK
 	user.SendPacket(PROTOCOL.ProtocolID_MoveEndRes, res)
+
+	nfy := &LobbyPacket.MoveEndNfy{}
+	nfy.EndPos = &user.targetLocation
+	user.enteredRoom.Broadcast(user, PROTOCOL.ProtocolID_MoveEndNfy, nfy)
+
 }
 
 func (user *User) RandomMove(duration time.Duration) {
