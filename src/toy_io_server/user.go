@@ -3,9 +3,12 @@ package main
 import (
 	Network "Network"
 	"log"
+	"math/rand"
+	"packet_lobby"
 	LobbyPacket "packet_lobby"
 	PROTOCOL "packet_protocol"
 	ReturnCode "packet_returncode"
+	"time"
 	Util "util"
 
 	"github.com/golang/protobuf/proto"
@@ -14,17 +17,19 @@ import (
 // User is session + logic packet
 type User struct {
 	*Network.Session
-	enteredRoom *Room
-	isReadyGame bool
-	posX        int
-	posy        int
+	enteredRoom     *Room
+	isReadyGame     bool
+	currentLocation packet_lobby.Location
+	targetLocation  packet_lobby.Location
 }
 
 // Init used for initialize of session
 func (user *User) Init(session *Network.Session) {
 	user.Session = session
-	user.posX = 0
-	user.posy = 0
+
+	user.currentLocation.X = 0
+	user.currentLocation.Y = 0
+	user.currentLocation.Z = 0
 }
 
 func (user *User) Close() {
@@ -34,7 +39,6 @@ func (user *User) Close() {
 
 	user.Session.Close()
 }
-
 
 // DispatchPacket is dispatch packet.
 func (user *User) HandlePacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
@@ -77,6 +81,36 @@ func (user *User) HandlePacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
 			log.Printf("%s\n", req.String())
 
 			user.OnRoomLeaveReq(req)
+		}
+
+	case PROTOCOL.ProtocolID_MoveStartReq:
+		{
+			req := &LobbyPacket.MoveStartReq{}
+			err := proto.Unmarshal(buffer[:], req)
+			Util.ProcessError(err)
+			log.Printf("%s\n", req.String())
+
+			user.OnMoveStartReq(req)
+		}
+
+	case PROTOCOL.ProtocolID_MoveChangeReq:
+		{
+			req := &LobbyPacket.MoveChangeReq{}
+			err := proto.Unmarshal(buffer[:], req)
+			Util.ProcessError(err)
+			log.Printf("%s\n", req.String())
+
+			user.OnMoveChangeReq(req)
+		}
+
+	case PROTOCOL.ProtocolID_MoveEndReq:
+		{
+			req := &LobbyPacket.MoveEndReq{}
+			err := proto.Unmarshal(buffer[:], req)
+			Util.ProcessError(err)
+			log.Printf("%s\n", req.String())
+
+			user.OnMoveEndReq(req)
 		}
 	}
 }
@@ -144,4 +178,45 @@ func (user *User) SetRoom(room *Room) {
 	user.Lock()
 	user.enteredRoom = room
 	user.Unlock()
+}
+
+func (user *User) OnMoveStartReq(req *LobbyPacket.MoveStartReq) {
+	req.GetTargetPos()
+
+	user.targetLocation.X = req.GetTargetPos().GetX()
+	user.targetLocation.Y = req.GetTargetPos().GetY()
+
+	res := &LobbyPacket.MoveStartRes{}
+	res.RetCode = ReturnCode.ReturnCode_retOK
+	user.SendPacket(PROTOCOL.ProtocolID_MoveStartRes, res)
+}
+
+func (user *User) OnMoveChangeReq(req *LobbyPacket.MoveChangeReq) {
+	user.targetLocation.X = req.GetTargetPos().GetX()
+	user.targetLocation.Y = req.GetTargetPos().GetY()
+
+	res := &LobbyPacket.MoveChangeReq{}
+	//res.RetCode = ReturnCode.ReturnCode_retOK
+	user.SendPacket(PROTOCOL.ProtocolID_MoveChangeRes, res)
+}
+
+func (user *User) OnMoveEndReq(req *LobbyPacket.MoveEndReq) {
+	user.targetLocation.X = req.GetTargetPos().GetX()
+	user.targetLocation.Y = req.GetTargetPos().GetY()
+
+	res := &LobbyPacket.MoveEndRes{}
+	res.RetCode = ReturnCode.ReturnCode_retOK
+	user.SendPacket(PROTOCOL.ProtocolID_MoveEndRes, res)
+}
+
+func (user *User) RandomMove(duration time.Duration) {
+	timer := time.NewTimer(duration)
+	func() {
+		<-timer.C
+
+		rand.NewSource(time.Now().UnixNano())
+
+		user.targetLocation.X += rand.Int31n(3)
+		user.targetLocation.Y += rand.Int31n(3)
+	}()
 }

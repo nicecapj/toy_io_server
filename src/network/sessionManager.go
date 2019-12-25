@@ -15,7 +15,6 @@ type SessionManager struct {
 	sync.Mutex
 	//sessionList map[net.Conn]interface{}
 	sessionList map[net.Conn]*Session
-	tickTimer   *time.Timer
 }
 
 var sessionManagerInstace *SessionManager
