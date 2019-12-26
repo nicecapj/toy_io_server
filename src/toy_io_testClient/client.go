@@ -3,10 +3,13 @@ package main
 import (
 	Network "Network"
 	"log"
+	"math/rand"
+	"packet_lobby"
 	LobbyPacket "packet_lobby"
 	PROTOCOL "packet_protocol"
 	RETURNCODE "packet_returncode"
 	"reflect"
+	"time"
 	"util"
 
 	"github.com/golang/protobuf/proto"
@@ -17,13 +20,25 @@ type ClientSession struct {
 	*Network.Session
 
 	//test
-	roomID   int32
-	roomName string
+	timer        *time.Timer
+	moveEndtimer *time.Timer
+
+	roomID          int32
+	roomName        string
+	currentLocation packet_lobby.Location
+	targetLocation  packet_lobby.Location
 }
 
 // Init used for initialize of session
 func (clientSession *ClientSession) Init(session *Network.Session) {
 	clientSession.Session = session
+
+	clientSession.currentLocation.X = 0
+	clientSession.currentLocation.Y = 0
+	clientSession.currentLocation.Z = 0
+	clientSession.targetLocation.X = 0
+	clientSession.targetLocation.Y = 0
+	clientSession.targetLocation.Z = 0
 }
 
 // DispatchPacket is dispatch packet.
@@ -59,6 +74,8 @@ func (clientSession *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolI
 
 			if res.RetCode != RETURNCODE.ReturnCode_retFail {
 				clientSession.RequestReadyForGameReq() //Considered to be loaded
+
+				clientSession.RandomMove(2000 * time.Millisecond)
 			}
 		}
 	case PROTOCOL.ProtocolID_RoomEnterNfy:
@@ -116,4 +133,32 @@ func (clientSession *ClientSession) RequestRoomLeaveReq() {
 
 	req := &LobbyPacket.RoomLeaveReq{Uid: clientSession.UID, RoomID: clientSession.roomID}
 	clientSession.SendPacket(PROTOCOL.ProtocolID_RoomLeaveReq, req)
+}
+
+func (clientSession *ClientSession) RandomMove(duration time.Duration) {
+	clientSession.timer = time.NewTimer(duration)
+	func() {
+		<-clientSession.timer.C
+
+		go clientSession.RandomMove(duration)
+
+		rand.NewSource(time.Now().UnixNano())
+
+		clientSession.targetLocation.X += rand.Int31n(3)
+		clientSession.targetLocation.Y += rand.Int31n(3)
+
+		//move start req
+		moveStartReq := &LobbyPacket.MoveStartReq{Uid: clientSession.UID, CurrentPos: &clientSession.currentLocation, TargetPos: &clientSession.targetLocation}
+		clientSession.SendPacket(PROTOCOL.ProtocolID_MoveStartReq, moveStartReq)
+
+		clientSession.moveEndtimer = time.NewTimer(500 * time.Millisecond)
+		func() {
+			<-clientSession.moveEndtimer.C
+
+			//move end req
+			moveEndReq := &LobbyPacket.MoveEndReq{Uid: clientSession.UID, TargetPos: &clientSession.targetLocation}
+			clientSession.SendPacket(PROTOCOL.ProtocolID_MoveEndReq, moveEndReq)
+		}()
+
+	}()
 }

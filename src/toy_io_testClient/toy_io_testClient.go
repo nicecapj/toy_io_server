@@ -56,7 +56,7 @@ func main() {
 		clientSession.PoolBuffer.Put(buffer)
 	}()
 
-	timer := time.NewTimer(3 * time.Second)
+	timer := time.NewTimer(30 * 60 * time.Second)
 	go func() {
 		<-timer.C
 		testPacketEnterAndLeaveRoom(clientSession)

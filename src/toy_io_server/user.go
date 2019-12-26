@@ -30,6 +30,9 @@ func (user *User) Init(session *Network.Session) {
 	user.currentLocation.X = 0
 	user.currentLocation.Y = 0
 	user.currentLocation.Z = 0
+	user.targetLocation.X = 0
+	user.targetLocation.Y = 0
+	user.targetLocation.Z = 0
 }
 
 func (user *User) Close() {
