@@ -101,8 +101,8 @@ message MoveEndRes{
 
 message MoveEndNfy{
 	int64 uid = 1;
-	Location startPos= 1;
-	Location endPos = 2;
+	Location startPos= 2;
+	Location endPos = 3;
 }
 
 message AttackTo{
