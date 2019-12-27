@@ -68,8 +68,9 @@ message MoveStartRes{
 }
 
 message MoveStartNfy{	
-	Location currentPos = 1;
-	Location targetPos = 2;
+	int64 uid = 1;
+	Location currentPos = 2;
+	Location targetPos = 3;
 }
 
 message MoveChangeReq{	
@@ -93,12 +94,13 @@ message MoveEndReq{
 	Location targetPos = 2;
 }
 
-message MoveEndRes{
+message MoveEndRes{	
 	returncode.ReturnCode retCode = 1;
 	Location endPos = 2;
 }
 
 message MoveEndNfy{
+	int64 uid = 1;
 	Location startPos= 1;
 	Location endPos = 2;
 }

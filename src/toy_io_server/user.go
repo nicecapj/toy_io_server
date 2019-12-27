@@ -194,6 +194,7 @@ func (user *User) OnMoveStartReq(req *LobbyPacket.MoveStartReq) {
 	user.SendPacket(PROTOCOL.ProtocolID_MoveStartRes, res)
 
 	nfy := &LobbyPacket.MoveStartNfy{}
+	nfy.Uid = req.Uid
 	nfy.TargetPos = &user.targetLocation
 	//nfy.TargetPos.X = user.targetLocation.X
 	//nfy.TargetPos.Y = user.targetLocation.Y
@@ -211,6 +212,7 @@ func (user *User) OnMoveChangeReq(req *LobbyPacket.MoveChangeReq) {
 	user.SendPacket(PROTOCOL.ProtocolID_MoveChangeRes, res)
 
 	nfy := &LobbyPacket.MoveChangeNfy{}
+	nfy.Uid = req.Uid
 	nfy.TargetPos = &user.targetLocation
 	user.enteredRoom.Broadcast(user, PROTOCOL.ProtocolID_MoveChangeNfy, nfy)
 }
