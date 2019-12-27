@@ -6,6 +6,7 @@
 - Room will be assigned automatically upon request.
 - The room is assigned to the same room until the room is full, and the room is assigned to the next room when the room is full.
   
+![with test Client](https://user-images.githubusercontent.com/8508812/71468789-9272c300-280a-11ea-9064-637b722106fd.png  )
 ![mainFlow_ver1](https://user-images.githubusercontent.com/8508812/59664539-34767a80-91ec-11e9-9183-657a4e991eaa.jpg)
 
 
