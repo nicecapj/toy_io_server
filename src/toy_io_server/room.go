@@ -99,6 +99,10 @@ func (room *Room) SendUserList(session *User) {
 }
 
 func (room *Room) Broadcast(sender *User, protocolID PROTOCOL.ProtocolID, pb proto.Message) {
+	if room == nil {
+		return //it occur test case only.
+	}
+
 	for e := room.userList.Back(); e != nil; e = e.Prev() {
 		user := e.Value.(*User)
 		if user != nil && user != sender {

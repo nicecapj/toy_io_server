@@ -86,7 +86,8 @@ message MoveChangeRes{
 
 message MoveChangeNfy{	
 	int64 uid = 1;
-	Location targetPos = 2;
+	Location currentPos = 2;
+	Location targetPos = 3;
 }
 
 message MoveEndReq{
@@ -96,16 +97,27 @@ message MoveEndReq{
 
 message MoveEndRes{	
 	returncode.ReturnCode retCode = 1;
-	Location endPos = 2;
+	Location targetPos = 2;
 }
 
 message MoveEndNfy{
-	int64 uid = 1;
-	Location startPos= 2;
-	Location endPos = 3;
+	int64 uid = 1;	
+	Location targetPos = 2;
 }
 
-message AttackTo{
+message AttackReq{
 	int64 targetUid = 1;
 	int32 skillID = 2;	
+}
+
+message AttackRes{
+	returncode.ReturnCode retCode = 1;	
+	int32 damage = 2;	
+}
+
+message AttackNfy{
+	int64 attackerUid = 1;
+	int64 targetUid = 2;
+	int32 skillID = 3;	
+	int32 damage = 4;	
 }
