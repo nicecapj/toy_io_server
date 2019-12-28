@@ -75,7 +75,7 @@ func (clientSession *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolI
 			if res.RetCode != RETURNCODE.ReturnCode_retFail {
 				clientSession.RequestReadyForGameReq() //Considered to be loaded
 
-				clientSession.RandomMove(2000 * time.Millisecond)
+				clientSession.RandomMove(1000 * time.Millisecond)
 			}
 		}
 	case PROTOCOL.ProtocolID_RoomEnterNfy:
@@ -144,8 +144,13 @@ func (clientSession *ClientSession) RandomMove(duration time.Duration) {
 
 		rand.NewSource(time.Now().UnixNano())
 
-		clientSession.targetLocation.X += rand.Int31n(3)
-		clientSession.targetLocation.Y += rand.Int31n(3)
+		if rand.Int31n(10) > 5 {
+			clientSession.targetLocation.X += rand.Int31n(3)
+			clientSession.targetLocation.Y += rand.Int31n(3)
+		} else {
+			clientSession.targetLocation.X -= rand.Int31n(3)
+			clientSession.targetLocation.Y -= rand.Int31n(3)
+		}
 
 		//move start req
 		moveStartReq := &LobbyPacket.MoveStartReq{Uid: clientSession.UID, CurrentPos: &clientSession.currentLocation, TargetPos: &clientSession.targetLocation}

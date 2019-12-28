@@ -36,7 +36,7 @@ func (sessionManager *SessionManager) Init() {
 	sessionManager.sessionList = make(map[net.Conn]*Session)
 
 	//timer
-	sessionManager.SetTimer(500 * time.Millisecond)
+	sessionManager.SetTimer(2000 * time.Millisecond)
 }
 
 // CreateSession make new sessionManager

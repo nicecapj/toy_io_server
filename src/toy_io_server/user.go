@@ -241,7 +241,12 @@ func (user *User) RandomMove(duration time.Duration) {
 
 		rand.NewSource(time.Now().UnixNano())
 
-		user.targetLocation.X += rand.Int31n(3)
-		user.targetLocation.Y += rand.Int31n(3)
+		if rand.Int31n(10) > 5 {
+			user.targetLocation.X += rand.Int31n(3)
+			user.targetLocation.Y += rand.Int31n(3)
+		} else {
+			user.targetLocation.X -= rand.Int31n(3)
+			user.targetLocation.Y -= rand.Int31n(3)
+		}
 	}()
 }
