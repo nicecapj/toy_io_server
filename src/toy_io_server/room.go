@@ -50,13 +50,15 @@ func (room *Room) Enter(session *User) bool {
 	for e := room.userList.Back(); e != nil; e = e.Prev() {
 		user := e.Value.(*User)
 
-		userInfo := &LobbyPacket.UserInfo{
-			Uid:      user.UID,
-			Name:     user.Name,
-			Location: &LobbyPacket.Location{},
-		}
+		if user != nil && user != session {
+			userInfo := &LobbyPacket.UserInfo{
+				Uid:      user.UID,
+				Name:     user.Name,
+				Location: &LobbyPacket.Location{},
+			}
 
-		nfy.UserInfoList = append(nfy.UserInfoList, userInfo)
+			nfy.UserInfoList = append(nfy.UserInfoList, userInfo)
+		}
 	}
 
 	room.Broadcast(session, PROTOCOL.ProtocolID_RoomEnterNfy, nfy)
@@ -105,9 +107,13 @@ func (room *Room) Broadcast(sender *User, protocolID PROTOCOL.ProtocolID, pb pro
 
 	for e := room.userList.Back(); e != nil; e = e.Prev() {
 		user := e.Value.(*User)
-		if user != nil && user != sender {
-			user.SendPacket(protocolID, pb)
-		}
+
+		//This way, if you have an existing user and you enter a room, you cant't receive information from other users.
+		//Broadcasting also handles me, and allows me to exclude myself from the members of the packet to be broadcast.
+		//if user != nil && user != sender {
+		//	user.SendPacket(protocolID, pb)
+		//}
+		user.SendPacket(protocolID, pb)
 	}
 }
 
