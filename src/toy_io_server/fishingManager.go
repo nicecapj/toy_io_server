@@ -57,11 +57,12 @@ func (manager *FishingManager) CatchFish(areaType int32) (int32, int32) {
 	}
 	//manager.Unlock()
 
+	var fishId, cm int32
 	if succeed {
-		manager.SelectFish(spawnPackId)
+		fishId, cm = manager.SelectFish(spawnPackId)
 	}
 
-	return 3, 3
+	return fishId, cm
 }
 
 // 1/1000 = 1% = 1000
@@ -78,23 +79,23 @@ func (manager *FishingManager) Win(prob int32) bool {
 	return false
 }
 
-func (manager *FishingManager) SelectFish(spawnPackId int32) int32 {
+func (manager *FishingManager) SelectFish(spawnPackId int32) (int32, int32) {
 	//데이터라 치고
 	rand.NewSource(time.Now().UnixNano())
 	switch spawnPackId {
 	case 1:
 		{
-			return rand.Int31n(10)
+			return rand.Int31n(10), rand.Int31n(10) + 1
 		}
 	case 2:
 		{
-			return rand.Int31n(20)
+			return rand.Int31n(20), rand.Int31n(20) + 1
 		}
 	case 3:
 		{
-			return rand.Int31n(30)
+			return rand.Int31n(30), rand.Int31n(30) + 1
 		}
 	}
 
-	return 99999999
+	return 0, 0
 }
