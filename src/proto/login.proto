@@ -121,3 +121,23 @@ message AttackNfy{
 	int32 skillID = 3;	
 	int32 damage = 4;	
 }
+
+message FisingStartReq{	
+	int32 areaId = 1;
+}
+
+message FisingStartRes{
+	returncode.ReturnCode retCode = 1;	
+}
+
+message FisingStartNfy{
+	int64 casterUid = 1;		
+	int32 rodType = 2;
+	//need to add : direction
+}
+
+message FisingHitNfy{
+	int64 casterUid = 1;	
+	int32 fishId = 2;
+	int32 fishCM = 3;
+}

@@ -121,7 +121,7 @@ func (sessionManager *SessionManager) Broadcast(protocolID PROTOCOL.ProtocolID, 
 func (sessionManager *SessionManager) OnTick(delta time.Duration) {
 
 	sessionManager.Lock()
-	//log.Printf("Lock : Update Tick")
+	log.Printf("Lock : Update Tick")
 
 	for _, session := range sessionManager.sessionList {
 		if session != nil {
@@ -130,10 +130,11 @@ func (sessionManager *SessionManager) OnTick(delta time.Duration) {
 	}
 
 	sessionManager.Unlock()
-	//log.Printf("UnLock : Update Tick")
+	log.Printf("UnLock : Update Tick")
 }
 
 func (sessionManager *SessionManager) SetTimer(duration time.Duration) {
+	//todo : make common timer handler!
 	timer := time.NewTimer(duration)
 	func() {
 		<-timer.C

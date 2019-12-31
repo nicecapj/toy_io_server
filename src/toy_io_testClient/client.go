@@ -75,7 +75,7 @@ func (clientSession *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolI
 			if res.RetCode != RETURNCODE.ReturnCode_retFail {
 				clientSession.RequestReadyForGameReq() //Considered to be loaded
 
-				clientSession.RandomMove(1000 * time.Millisecond)
+				clientSession.RandomAction(1000 * time.Millisecond)
 			}
 		}
 	case PROTOCOL.ProtocolID_RoomEnterNfy:
@@ -103,6 +103,31 @@ func (clientSession *ClientSession) DispatchPacket(protocolID PROTOCOL.ProtocolI
 			if res.RetCode == RETURNCODE.ReturnCode_retOK {
 				clientSession.roomID = 0
 			}
+		}
+	case PROTOCOL.ProtocolID_FisingStartRes:
+		{
+			res := &LobbyPacket.FisingStartRes{}
+			err := proto.Unmarshal(buffer[:], res)
+			util.ProcessError(err)
+			log.Printf("%s\n", res.String())
+
+			if res.RetCode == RETURNCODE.ReturnCode_retOK {
+				//cancel casting.
+			}
+		}
+	case PROTOCOL.ProtocolID_FisingStartNfy:
+		{
+			res := &LobbyPacket.FisingStartNfy{}
+			err := proto.Unmarshal(buffer[:], res)
+			util.ProcessError(err)
+			log.Printf("%s\n", res.String())
+		}
+	case PROTOCOL.ProtocolID_FisingHitNfy:
+		{
+			res := &LobbyPacket.FisingHitNfy{}
+			err := proto.Unmarshal(buffer[:], res)
+			util.ProcessError(err)
+			log.Printf("%s\n", res.String())
 		}
 	}
 }
@@ -135,12 +160,13 @@ func (clientSession *ClientSession) RequestRoomLeaveReq() {
 	clientSession.SendPacket(PROTOCOL.ProtocolID_RoomLeaveReq, req)
 }
 
+// RandomMove is send moving packet to server
 func (clientSession *ClientSession) RandomMove(duration time.Duration) {
 	clientSession.timer = time.NewTimer(duration)
 	func() {
 		<-clientSession.timer.C
 
-		go clientSession.RandomMove(duration)
+		go clientSession.RandomAction(duration)
 
 		rand.NewSource(time.Now().UnixNano())
 
@@ -157,7 +183,7 @@ func (clientSession *ClientSession) RandomMove(duration time.Duration) {
 		clientSession.SendPacket(PROTOCOL.ProtocolID_MoveStartReq, moveStartReq)
 
 		clientSession.moveEndtimer = time.NewTimer(500 * time.Millisecond)
-		func() {
+		go func() {
 			<-clientSession.moveEndtimer.C
 
 			//move end req
@@ -166,4 +192,29 @@ func (clientSession *ClientSession) RandomMove(duration time.Duration) {
 		}()
 
 	}()
+}
+
+// CastFishing is send fising packet to server
+func (clientSession *ClientSession) CastFishing(duration time.Duration) {
+	clientSession.timer = time.NewTimer(duration)
+	<-clientSession.timer.C
+
+	go clientSession.RandomAction(3000 * time.Millisecond)
+
+	//move start req
+	fishingStartReq := &LobbyPacket.FisingStartReq{AreaId: 1}
+	clientSession.SendPacket(PROTOCOL.ProtocolID_FisingStartReq, fishingStartReq)
+
+}
+
+// RandomAction is test function package for server logic
+func (clientSession *ClientSession) RandomAction(duration time.Duration) {
+	rand.NewSource(time.Now().UnixNano())
+	rndCase := rand.Intn(10)
+
+	if rndCase >= 5 {
+		clientSession.RandomMove(duration)
+	} else {
+		clientSession.CastFishing(duration)
+	}
 }

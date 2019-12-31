@@ -23,4 +23,13 @@ enum ProtocolID {
 	MoveEndReq = 16;
 	MoveEndRes = 17;
 	MoveEndNfy = 18;
+
+	AttackReq = 19;
+	AttackRes = 20;
+	AttackNfy = 21;
+
+	FisingStartReq = 22;
+	FisingStartRes = 23;
+	FisingStartNfy = 24;
+	FisingHitNfy = 25;
 }

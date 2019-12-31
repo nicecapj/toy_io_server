@@ -35,8 +35,8 @@ func (session *Session) InitConnection(conn net.Conn) {
 	session.Conn = conn
 	session.isConnected = true
 
-	session.recvChan = make(chan Packet, 2)
-	session.sendChan = make(chan Packet, 2)
+	session.recvChan = make(chan Packet, 5)
+	session.sendChan = make(chan Packet, 5)
 	session.exitChan = make(chan struct{})
 
 	session.PoolBuffer = sync.Pool{
@@ -176,7 +176,7 @@ func (session *Session) OnTick(delta time.Duration) {
 	//sync lock! it make stop sessionManager`s ontick
 
 	// //channel style
-	// for sendPacket := range session.`sendChan` {
+	// for sendPacket := range session.sendChan {
 	// 	log.Printf("channel send : %d\n", sendPacket.Header.PacketID)
 	// 	session.Send(sendPacket.MessageStream)
 	// }

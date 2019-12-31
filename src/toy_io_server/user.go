@@ -115,6 +115,16 @@ func (user *User) HandlePacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
 
 			user.OnMoveEndReq(req)
 		}
+
+	case PROTOCOL.ProtocolID_FisingStartReq:
+		{
+			req := &LobbyPacket.FisingStartReq{}
+			err := proto.Unmarshal(buffer[:], req)
+			Util.ProcessError(err)
+			log.Printf("%s\n", req.String())
+
+			user.OnFisingStartReq(req)
+		}
 	}
 }
 
@@ -232,6 +242,35 @@ func (user *User) OnMoveEndReq(req *LobbyPacket.MoveEndReq) {
 	nfy.TargetPos = &user.targetLocation
 	user.enteredRoom.Broadcast(user, PROTOCOL.ProtocolID_MoveEndNfy, nfy)
 
+}
+
+func (user *User) OnFisingStartReq(req *LobbyPacket.FisingStartReq) {
+
+	//var fishId int32
+	//var cm int32
+
+	fishingManager := GetFishingManager()
+	fishId, cm := fishingManager.CatchFish(req.AreaId)
+
+	timer := time.NewTimer(2000 * time.Millisecond)
+	go func() {
+		<-timer.C
+
+		hitNfy := &LobbyPacket.FisingHitNfy{}
+		hitNfy.CasterUid = user.UID
+		hitNfy.FishId = fishId
+		hitNfy.FishCM = cm
+		user.enteredRoom.Broadcast(user, PROTOCOL.ProtocolID_FisingHitNfy, hitNfy)
+	}()
+
+	res := &LobbyPacket.FisingStartRes{}
+	res.RetCode = ReturnCode.ReturnCode_retOK
+	user.SendPacket(PROTOCOL.ProtocolID_FisingStartRes, res)
+
+	nfy := &LobbyPacket.FisingStartNfy{}
+	nfy.CasterUid = user.UID
+	nfy.RodType = 1
+	user.enteredRoom.Broadcast(user, PROTOCOL.ProtocolID_FisingStartNfy, nfy)
 }
 
 func (user *User) RandomMove(duration time.Duration) {
