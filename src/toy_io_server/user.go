@@ -14,6 +14,8 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
+type PacketHandler func(buffer []byte)
+
 // User is session + logic packet
 type User struct {
 	*Network.Session
@@ -21,11 +23,14 @@ type User struct {
 	isReadyGame     bool
 	currentLocation packet_lobby.Location
 	targetLocation  packet_lobby.Location
+
+	handle map[PROTOCOL.ProtocolID]PacketHandler
 }
 
 // Init used for initialize of session
 func (user *User) Init(session *Network.Session) {
 	user.Session = session
+	user.InitHandler()
 
 	user.currentLocation.X = 0
 	user.currentLocation.Y = 0
@@ -33,6 +38,24 @@ func (user *User) Init(session *Network.Session) {
 	user.targetLocation.X = 0
 	user.targetLocation.Y = 0
 	user.targetLocation.Z = 0
+}
+
+func (user *User) InitHandler() {
+	user.handle = make(map[PROTOCOL.ProtocolID]PacketHandler)
+
+	user.handle[PROTOCOL.ProtocolID_LoginReq] = user.HandleLoginReq
+	user.handle[PROTOCOL.ProtocolID_RoomEnterReq] = user.HandleRoomEnterReq
+	user.handle[PROTOCOL.ProtocolID_ReadyForGameReq] = user.HandleReadyForGameReq
+	user.handle[PROTOCOL.ProtocolID_RoomLeaveReq] = user.HandleRoomLeaveReq
+	user.handle[PROTOCOL.ProtocolID_MoveStartReq] = user.HandleMoveStartReq
+	user.handle[PROTOCOL.ProtocolID_MoveChangeReq] = user.HandleMoveChangeReq
+	user.handle[PROTOCOL.ProtocolID_MoveEndReq] = user.HandleMoveEndReq
+	user.handle[PROTOCOL.ProtocolID_FisingStartReq] = user.HandleFisingStartReq
+}
+
+// DispatchPacket is dispatch packet.
+func (user *User) HandlePacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+	user.handle[protocolID](buffer)
 }
 
 func (user *User) Close() {
@@ -43,91 +66,84 @@ func (user *User) Close() {
 	user.Session.Close()
 }
 
-// DispatchPacket is dispatch packet.
-func (user *User) HandlePacket(protocolID PROTOCOL.ProtocolID, buffer []byte) {
+//=================================================================================================
+//PACKET HANDLERS
+//=================================================================================================
+func (user *User) HandleLoginReq(buffer []byte) {
+	req := &LobbyPacket.LoginReq{}
+	err := proto.Unmarshal(buffer[:], req)
+	Util.ProcessError(err)
+	log.Printf("%s\n", req.String())
 
-	switch protocolID {
-	case PROTOCOL.ProtocolID_LoginReq:
-		{
-			req := &LobbyPacket.LoginReq{}
-			err := proto.Unmarshal(buffer[:], req)
-			Util.ProcessError(err)
-			log.Printf("%s\n", req.String())
+	user.OnLoginReq(req)
+}
 
-			user.OnLoginReq(req)
-		}
+func (user *User) HandleRoomEnterReq(buffer []byte) {
+	req := &LobbyPacket.RoomEnterReq{}
+	err := proto.Unmarshal(buffer[:], req)
+	Util.ProcessError(err)
+	log.Printf("%s\n", req.String())
 
-	case PROTOCOL.ProtocolID_RoomEnterReq:
-		{
-			req := &LobbyPacket.RoomEnterReq{}
-			err := proto.Unmarshal(buffer[:], req)
-			Util.ProcessError(err)
-			log.Printf("%s\n", req.String())
+	user.OnRoomEnterReq(req)
+}
 
-			user.OnRoomEnterReq(req)
-		}
-	case PROTOCOL.ProtocolID_ReadyForGameReq:
-		{
-			req := &LobbyPacket.ReadyForGameReq{}
-			err := proto.Unmarshal(buffer[:], req)
-			Util.ProcessError(err)
-			log.Printf("%s\n", req.String())
+func (user *User) HandleReadyForGameReq(buffer []byte) {
+	req := &LobbyPacket.ReadyForGameReq{}
+	err := proto.Unmarshal(buffer[:], req)
+	Util.ProcessError(err)
+	log.Printf("%s\n", req.String())
 
-			user.OnReadyForGameReq(req)
-		}
+	user.OnReadyForGameReq(req)
+}
 
-	case PROTOCOL.ProtocolID_RoomLeaveReq:
-		{
-			req := &LobbyPacket.RoomLeaveReq{}
-			err := proto.Unmarshal(buffer[:], req)
-			Util.ProcessError(err)
-			log.Printf("%s\n", req.String())
+func (user *User) HandleRoomLeaveReq(buffer []byte) {
+	req := &LobbyPacket.RoomLeaveReq{}
+	err := proto.Unmarshal(buffer[:], req)
+	Util.ProcessError(err)
+	log.Printf("%s\n", req.String())
 
-			user.OnRoomLeaveReq(req)
-		}
+	user.OnRoomLeaveReq(req)
+}
 
-	case PROTOCOL.ProtocolID_MoveStartReq:
-		{
-			req := &LobbyPacket.MoveStartReq{}
-			err := proto.Unmarshal(buffer[:], req)
-			Util.ProcessError(err)
-			log.Printf("%s\n", req.String())
+func (user *User) HandleMoveStartReq(buffer []byte) {
+	req := &LobbyPacket.MoveStartReq{}
+	err := proto.Unmarshal(buffer[:], req)
+	Util.ProcessError(err)
+	log.Printf("%s\n", req.String())
 
-			user.OnMoveStartReq(req)
-		}
+	user.OnMoveStartReq(req)
+}
 
-	case PROTOCOL.ProtocolID_MoveChangeReq:
-		{
-			req := &LobbyPacket.MoveChangeReq{}
-			err := proto.Unmarshal(buffer[:], req)
-			Util.ProcessError(err)
-			log.Printf("%s\n", req.String())
+func (user *User) HandleMoveChangeReq(buffer []byte) {
+	req := &LobbyPacket.MoveChangeReq{}
+	err := proto.Unmarshal(buffer[:], req)
+	Util.ProcessError(err)
+	log.Printf("%s\n", req.String())
 
-			user.OnMoveChangeReq(req)
-		}
+	user.OnMoveChangeReq(req)
+}
 
-	case PROTOCOL.ProtocolID_MoveEndReq:
-		{
-			req := &LobbyPacket.MoveEndReq{}
-			err := proto.Unmarshal(buffer[:], req)
-			Util.ProcessError(err)
-			log.Printf("%s\n", req.String())
+func (user *User) HandleMoveEndReq(buffer []byte) {
+	req := &LobbyPacket.MoveEndReq{}
+	err := proto.Unmarshal(buffer[:], req)
+	Util.ProcessError(err)
+	log.Printf("%s\n", req.String())
 
-			user.OnMoveEndReq(req)
-		}
+	user.OnMoveEndReq(req)
+}
 
-	case PROTOCOL.ProtocolID_FisingStartReq:
-		{
-			req := &LobbyPacket.FisingStartReq{}
-			err := proto.Unmarshal(buffer[:], req)
-			Util.ProcessError(err)
-			log.Printf("%s\n", req.String())
+func (user *User) HandleFisingStartReq(buffer []byte) {
+	{
+		req := &LobbyPacket.FisingStartReq{}
+		err := proto.Unmarshal(buffer[:], req)
+		Util.ProcessError(err)
+		log.Printf("%s\n", req.String())
 
-			user.OnFisingStartReq(req)
-		}
+		user.OnFisingStartReq(req)
 	}
 }
 
+//=================================================================================================
 // OnLoginReq is handler for login request from client
 func (user *User) OnLoginReq(req *LobbyPacket.LoginReq) {
 	accountManager := Network.GetAccountManager()
