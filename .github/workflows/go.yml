@@ -24,5 +24,8 @@ jobs:
             dep ensure
         fi
 
-    - name: Build
-      run: go build -v ./toy_io_server/src/toy_io_server/
+    - name: Build server
+      run: go build -v ./src/toy_io_server
+      
+    - name: Build client
+      run: go build -v ./src/toy_io_testClient
