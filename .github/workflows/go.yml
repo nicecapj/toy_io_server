@@ -22,18 +22,5 @@ jobs:
     - name: Display files
       run: ls -al
       
-    - name: set server
-      run : cd src
-      
-    - name: set server
-      run : cd toy_io_server      
-      
-
-    - name: set client
-      run : /src/toy_io_testClient/go mod tidy
-
-    - name: Build server
-      run: /home/runner/work/toy_io_server/toy_io_server/src/toy_io_server/go build
-
-    - name: Build client
-      run: /home/runner/work/toy_io_server/toy_io_server/src/toy_io_testClient/go build
+     name: Build server      
+      run: go build -v ./src/toy_io_server
