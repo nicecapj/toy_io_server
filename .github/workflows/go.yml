@@ -1,25 +1,32 @@
 name: Go
-
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
+on: [push]
 jobs:
 
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
+    - name: Set up Go 1.17
+      uses: actions/setup-go@v1
       with:
         go-version: 1.17
+      id: go
 
-    - name: Build
-      run: go build -v ./...
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
 
-    - name: Test
-      run: go test -v ./...
+    - name: Display path
+      run: pwd
+      
+    - name: Display files
+      run: ls -al
+      
+    - name: move clientDirectory
+      run : cd src/toy_io_testClient
+
+    - name: Get dependencies
+      run: git mod tidy
+
+    - name: Build client
+      run: go build
