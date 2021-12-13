@@ -22,5 +22,5 @@ jobs:
     - name: Display files
       run: ls -al
       
-     name: Build server      
+    - name: Build server      
       run: go build -v ./src/toy_io_server
