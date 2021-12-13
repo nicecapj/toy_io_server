@@ -23,7 +23,7 @@ jobs:
       run: ls -al
       
     - name: set server
-      run : src/toy_io_server/go mod tidy
+      run : /src/toy_io_server/go mod tidy
 
     - name: set client
       run : /src/toy_io_testClient/go mod tidy
