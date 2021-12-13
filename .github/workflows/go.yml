@@ -23,13 +23,13 @@ jobs:
       run: ls -al
       
     - name: set server
-      run : /home/runner/work/toy_io_server/toy_io_server/src/toy_io_server/go mod tidy
+      run : src/toy_io_server/go mod tidy
 
     - name: set client
-      run : /home/runner/work/toy_io_server/toy_io_server/src/toy_io_testClient/go mod tidy
+      run : /src/toy_io_testClient/go mod tidy
 
     - name: Build server
       run: /home/runner/work/toy_io_server/toy_io_server/src/toy_io_server/go build
-      
+
     - name: Build client
       run: /home/runner/work/toy_io_server/toy_io_server/src/toy_io_testClient/go build
