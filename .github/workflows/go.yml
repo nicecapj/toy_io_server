@@ -26,7 +26,7 @@ jobs:
       run : cd src/toy_io_testClient
 
     - name: Get dependencies
-      run: git mod tidy
+      run: go mod tidy
 
     - name: Build client
       run: go build
