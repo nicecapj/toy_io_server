@@ -18,10 +18,11 @@ jobs:
 
     - name: Display path
       run: pwd
-      
-    - name: Display files
-      run: ls -al
-      
+            
     - name: Build server      
       working-directory: ./src/toy_io_server
+      run: go build -v
+
+    - name: Build test client
+      working-directory: ./src/toy_io_testClient
       run: go build -v
