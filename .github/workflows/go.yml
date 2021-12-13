@@ -23,7 +23,13 @@ jobs:
       run: ls -al
       
     - name: move clientDirectory
-      run : cd src/toy_io_testClient
+      run : cd src
+
+    - name: Display files
+      run: ls -al
+
+    - name: move clientDirectory
+      run : cd toy_io_server            
 
     - name: Get dependencies
       run: go mod tidy
