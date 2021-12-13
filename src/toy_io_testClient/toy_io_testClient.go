@@ -1,7 +1,7 @@
 package main
 
 import (
-	Network "Network"
+	Network "network"
 	"bytes"
 	"fmt"
 	"io"
