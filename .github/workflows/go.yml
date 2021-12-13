@@ -23,4 +23,5 @@ jobs:
       run: ls -al
       
     - name: Build server      
-      run: go build -v ./toy_io_server
+      working-directory: ./src/toy_io_server
+      run: go build -v
