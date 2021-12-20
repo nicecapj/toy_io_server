@@ -10,11 +10,13 @@ import (
 func main() {
 	//timer
 	timerManager := network.GetTimerManager()
-	timerManager.AddTimer(3000, func() {
-		log.Println("call timer")
-	})
-	log.Println("call timer end")
 
+	log.Println("call timer")
+	timerManager.AddTimer(3000, func() {
+		log.Println("called function after 3sec")
+	})
+
+	log.Println("wait 10sec")
 	timeTemp := time.NewTimer(time.Millisecond * 10000)
-	<-timeTemp.C //블록하지 말고, 비동기로 처리
+	<-timeTemp.C //wait for finish
 }
