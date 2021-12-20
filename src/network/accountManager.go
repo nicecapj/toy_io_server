@@ -3,13 +3,18 @@ package network
 import (
 	"log"
 	"sync"
+
+	//you were to generate 10 trillion UUID -> 10조
+	//705e4dcb-3ecd-24f3-3a35-3e926e4bded5 36character
+	//type UUID [16]byte
+	"github.com/google/uuid"
 )
 
 //AccountManager ...
 type AccountManager struct {
 	sync.Mutex
 	userList      map[string]bool
-	uidList       map[string]int64
+	uidList       map[string]string
 	beginUIDIndex int64
 }
 
@@ -31,7 +36,7 @@ func (accountManager *AccountManager) Init() {
 
 	accountManager.userList = make(map[string]bool)
 	//accountManager.userList = []string{}
-	accountManager.uidList = make(map[string]int64)
+	accountManager.uidList = make(map[string]string)
 	accountManager.beginUIDIndex = 2222
 }
 
@@ -78,7 +83,7 @@ func (accountManager *AccountManager) FindUser(name string) bool {
 }
 
 //GetUID ...
-func (accountManager *AccountManager) GetUID(name string) int64 {
+func (accountManager *AccountManager) GetUID(name string) string {
 
 	accountManager.Lock()
 	if val, ok := accountManager.uidList[name]; ok {
@@ -86,9 +91,11 @@ func (accountManager *AccountManager) GetUID(name string) int64 {
 		return val
 	}
 
-	count := len(accountManager.uidList)
-	count = int(accountManager.beginUIDIndex) + count
-	accountManager.uidList[name] = int64(count)
+	//count := len(accountManager.uidList)
+	//count = int(accountManager.beginUIDIndex) + count
+	//accountManager.uidList[name] = int64(count)
+
+	accountManager.uidList[name] = uuid.New().String()
 	accountManager.Unlock()
-	return int64(count)
+	return accountManager.uidList[name]
 }

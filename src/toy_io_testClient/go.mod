@@ -11,7 +11,10 @@ require (
 	util v0.0.0
 )
 
-require google.golang.org/protobuf v1.26.0 // indirect
+require (
+	github.com/google/uuid v1.3.0 // indirect
+	google.golang.org/protobuf v1.26.0 // indirect
+)
 
 replace util => ../util
 

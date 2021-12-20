@@ -27,7 +27,7 @@ type Session struct {
 	exitChan chan struct{}
 
 	Name string
-	UID  int64
+	UID  string
 }
 
 //InitConnection ...

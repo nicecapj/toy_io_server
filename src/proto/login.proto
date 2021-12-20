@@ -9,7 +9,7 @@ message LoginReq {
 
 message LoginRes {	
 	returncode.ReturnCode retCode = 1;
-	int64 uid = 2;
+	string uid = 2;
 	string name = 3;
 }
 
@@ -20,13 +20,13 @@ message Location{
 }
 
 message UserInfo{
-	int64 uid = 1;
+	string uid = 1;
 	string name = 2;
 	Location location = 3;
 }
 
 message RoomEnterReq {	
-	int64 uid = 1;
+	string uid = 1;
 }
 
 message RoomEnterRes {
@@ -40,11 +40,11 @@ message RoomEnterNfy {
 }
 
 message ReadyForGameReq {	
-	int64 uid = 1;
+	string uid = 1;
 }
 
 message RoomLeaveReq {	
-	int64 uid = 1;
+	string uid = 1;
 	int32 roomID = 2;
 }
 
@@ -57,7 +57,7 @@ message RoomLeaveNfy {
 }
 
 message MoveStartReq{
-	int64 uid = 1;
+	string uid = 1;
 	Location currentPos = 2;
 	Location targetPos = 3;
 }
@@ -68,13 +68,13 @@ message MoveStartRes{
 }
 
 message MoveStartNfy{	
-	int64 uid = 1;
+	string uid = 1;
 	Location currentPos = 2;
 	Location targetPos = 3;
 }
 
 message MoveChangeReq{	
-	int64 uid = 1;
+	string uid = 1;
 	Location currentPos = 2;
 	Location targetPos = 3;
 }
@@ -85,13 +85,13 @@ message MoveChangeRes{
 }
 
 message MoveChangeNfy{	
-	int64 uid = 1;
+	string uid = 1;
 	Location currentPos = 2;
 	Location targetPos = 3;
 }
 
 message MoveEndReq{
-	int64 uid = 1;
+	string uid = 1;
 	Location targetPos = 2;
 }
 
@@ -101,12 +101,12 @@ message MoveEndRes{
 }
 
 message MoveEndNfy{
-	int64 uid = 1;	
+	string uid = 1;	
 	Location targetPos = 2;
 }
 
 message AttackReq{
-	int64 targetUid = 1;
+	string targetUid = 1;
 	int32 skillID = 2;	
 }
 
@@ -116,8 +116,8 @@ message AttackRes{
 }
 
 message AttackNfy{
-	int64 attackerUid = 1;
-	int64 targetUid = 2;
+	string attackerUid = 1;
+	string targetUid = 2;
 	int32 skillID = 3;	
 	int32 damage = 4;	
 }
@@ -131,13 +131,13 @@ message FisingStartRes{
 }
 
 message FisingStartNfy{
-	int64 casterUid = 1;		
+	string casterUid = 1;		
 	int32 rodType = 2;
 	//need to add : direction
 }
 
 message FisingHitNfy{
-	int64 casterUid = 1;	
+	string casterUid = 1;	
 	int32 fishId = 2;
 	int32 fishCM = 3;
 }
